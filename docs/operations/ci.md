@@ -16,8 +16,8 @@ flowchart TB
 
 | Job | Runner | Checks |
 | --- | --- | --- |
-| quality | Blacksmith Ubuntu 4 vCPU | `bun run` format, lint, typecheck, test, build |
-| macos | Blacksmith macOS 15 | `swift run LoftKitCheck` and `swift build` for Loft.app |
-| hygiene | Blacksmith Ubuntu 2 vCPU | docs, LOC budgets, actionlint, `git diff --check` |
+| quality | GitHub-hosted Ubuntu 24.04 | `bun run` format, lint, typecheck, test, build |
+| macos | GitHub-hosted macOS 15 | `swift run LoftKitCheck` and `swift build` for Loft.app |
+| hygiene | GitHub-hosted Ubuntu 24.04 | docs, LOC budgets, actionlint, `git diff --check` |
 
 A green `ci` run on `main` is what [auto-release](releasing.md) waits for.

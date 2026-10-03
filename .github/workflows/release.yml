@@ -23,7 +23,7 @@ env:
 
 jobs:
   publish:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -67,7 +67,7 @@ jobs:
           files: loft-site.tar.gz
 
   macos:
-    runs-on: blacksmith-6vcpu-macos-15
+    runs-on: macos-15
     timeout-minutes: 25
     needs: publish
     steps:
