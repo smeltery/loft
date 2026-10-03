@@ -3,16 +3,18 @@
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
   "packageManager": "bun@1.4.2",
-  "type": "module",
+  "workspaces": [
+    "apps/web",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "bun test src",
-    "lint": "biome lint src scripts vite.config.ts",
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
     "format": "biome format --write .",
     "format:check": "biome ci --formatter-enabled=true --linter-enabled=false --assist-enabled=false .",
-    "typecheck": "tsc --noEmit",
     "check:file-sizes": "bun scripts/check-file-sizes.ts",
     "check:flat-directories": "bun scripts/check-flat-directories.ts",
     "check:markdown": "bun scripts/check-markdown.ts",
@@ -21,23 +23,17 @@
     "check:docs": "bun run check:markdown && bun run check:mermaid && bun run check:doc-links",
     "check:budgets": "bun run check:file-sizes && bun run check:flat-directories",
     "check:hygiene": "bun run check:docs && bun run check:budgets",
-    "ci": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build && bun run check:hygiene"
-  },
-  "dependencies": {
-    "@fontsource-variable/inter": "^5.2.8",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "macos:test": "bash scripts/macos-ci.sh test",
+    "macos:build": "bash scripts/macos-ci.sh build",
+    "ci": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build && bun run check:hygiene && bun run macos:test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.5",
     "@types/bun": "^1.4.2",
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
-    "@vitejs/plugin-react": "^5.0.4",
     "linkedom": "^0.18.12",
     "markdownlint": "^0.39.0",
     "mermaid": "^11.12.0",
-    "typescript": "^5.9.3",
-    "vite": "^7.1.7"
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.3"
   }
 }

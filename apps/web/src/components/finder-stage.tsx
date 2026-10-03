@@ -3,6 +3,7 @@ import { files } from '../copy'
 const selected = files[0]
 
 export default function FinderStage() {
+  if (!selected) return null
   return (
     <div className="window" aria-hidden="true">
       <div className="traffic">

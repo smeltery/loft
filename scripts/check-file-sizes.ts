@@ -12,7 +12,7 @@ const budgets = JSON.parse(readFileSync(budgetsFile, 'utf8')) as {
 }
 
 const tracked = (await $`git ls-files`.text()).split('\n').filter(Boolean)
-const suffix = /\.(ts|tsx|js|mjs|cjs|md|mdx|css|json|toml|ya?ml)$/
+const suffix = /\.(ts|tsx|js|mjs|cjs|md|mdx|css|json|toml|ya?ml|swift)$/
 const excluded = /(^bun\.lock$)/
 
 let fail = false

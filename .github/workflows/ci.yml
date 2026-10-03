@@ -46,6 +46,17 @@ jobs:
       - run: bun run test
       - run: bun run build
 
+  macos:
+    name: macos
+    runs-on: blacksmith-6vcpu-macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+      - run: swift run --package-path apps/macos LoftKitCheck
+      - run: swift build --package-path apps/macos --product Loft
+
   hygiene:
     name: hygiene
     runs-on: blacksmith-2vcpu-ubuntu-2404
@@ -69,6 +80,6 @@ jobs:
       - run: bun run check:hygiene
 
       - name: actionlint and shellcheck
-        run: flox activate -- bash -lc 'actionlint && shellcheck .githooks/pre-commit .githooks/pre-push'
+        run: flox activate -- bash -lc 'actionlint && shellcheck .githooks/pre-commit .githooks/pre-push scripts/macos-ci.sh scripts/package-macos.sh'
 
       - run: git diff --check

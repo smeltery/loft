@@ -8,8 +8,15 @@ bun install --frozen-lockfile
 bun run dev
 ```
 
-Open `http://localhost:3000`. The page is a single marketing surface: hero,
-Finder mock, how it works, comparison, plan, FAQ, and download.
+Open `http://localhost:3000`. Request-files landings use `/r/<token>`.
+
+On macOS:
+
+```bash
+bun run macos:test
+scripts/package-macos.sh
+open dist/Loft.app
+```
 
 ```mermaid
 flowchart LR

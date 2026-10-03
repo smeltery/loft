@@ -1,0 +1,36 @@
+{
+  "brand": "loft",
+  "menu": [
+    { "id": "search", "title": "Search Loft", "shortcut": "⌃⌥O" },
+    { "id": "finder", "title": "Open in Finder" },
+    { "id": "account", "title": "Your Account", "trailing": "↗" },
+    { "id": "feedback", "title": "Send Feedback" },
+    { "id": "sep", "separator": true },
+    { "id": "settings", "title": "Settings…", "shortcut": "⌘," },
+    { "id": "quit", "title": "Quit Loft", "shortcut": "⌘Q" }
+  ],
+  "drop": {
+    "release": "Release to add",
+    "item": "1 item",
+    "intoFolder": "Or into a folder"
+  },
+  "transfer": {
+    "title": "Downloading 24.1 GB of 38.6 GB",
+    "subtitle": "To keep on this Mac, as you chose."
+  },
+  "context": [
+    "Open",
+    "Open With",
+    "Get Info",
+    "Rename",
+    "Copy Loft Link",
+    "Request Files…"
+  ],
+  "request": {
+    "title": "Footage for the wedding film",
+    "sub": "Files you add go straight to their Loft.",
+    "choose": "Choose files",
+    "orDrop": "or drop them here"
+  },
+  "searchPlaceholder": "Search Loft"
+}

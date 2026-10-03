@@ -18,7 +18,8 @@ Flox sets `core.hooksPath` to `.githooks`. Those hooks run the same checks as
 | --- | --- |
 | `bun run dev` | Vite on port 3000 |
 | `bun run test` | Unit tests |
-| `bun run ci` | format, lint, types, tests, build, docs, budgets |
+| `bun run ci` | format, lint, types, tests, build, docs, budgets, macOS tests |
+| `bun run macos:build` | Swift Loft binary (macOS) |
 
 Open a pull request against `main`. Do not skip hooks unless you are unblocking
 a broken tool, and say so in the PR.

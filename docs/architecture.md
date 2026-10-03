@@ -1,27 +1,21 @@
 # Architecture
 
-The site is a Vite + React app. Copy lives in `src/copy.ts`. Layout tokens in
-`src/styles.css` match the public marketing density: 880px content, 16px
-radius, `#f5f5f5` page ground, SF/Inter stack.
+Loft is a Bun workspace with a Swift package beside it.
 
 ```mermaid
 flowchart TB
-  copy[src/copy.ts]
-  app[src/App.tsx]
-  sections[Section components]
-  css[src/styles.css]
-  copy --> app --> sections
-  css --> sections
-  sections --> page[Static page]
+  core["packages/core"]
+  web["apps/web"]
+  kit["apps/macos LoftKit"]
+  app["apps/macos Loft.app"]
+  core --> web
+  kit --> app
+  core -.->|same chrome strings| kit
 ```
 
-There is no application backend here. Download points at GitHub Releases.
-Pricing math is local (`src/lib/price.ts`) so the stepper cannot drift from
-the published $9/TB rate.
+- `@loft/core` — catalog, placeholder disk math, share/request URLs, status-menu copy.
+- `apps/web` — marketing site and the request-files landing page (`/r/:token`).
+- `apps/macos` — menu-bar app, search, drop overlay, settings, local drive store.
 
-## Constraints
-
-- One route. No app shell, auth, or CMS.
-- File-size budget 400 lines; 20 files per directory unless listed in
-  `scripts/flat-directory-budgets.json`.
-- Bun for install, tests, and hygiene scripts.
+File-size budget is 400 lines; 20 files per directory unless listed in
+`scripts/flat-directory-budgets.json`.

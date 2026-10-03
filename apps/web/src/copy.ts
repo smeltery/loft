@@ -7,19 +7,13 @@ export const site = {
   downloadHref: 'https://github.com/smeltery/loft/releases/latest',
 }
 
-export const files = [
-  { name: 'wedding-film_final.mov', size: '48.2 GB', kind: 'QuickTime movie' },
-  { name: 'Edit Notes.md', size: '12 KB', kind: 'Markdown' },
-  { name: 'Pitch Deck.pdf', size: '48 MB', kind: 'PDF' },
-  { name: 'drone-coast_4k.mp4', size: '21.7 GB', kind: 'MPEG-4 movie' },
-  { name: 'Brand Shoot.jpg', size: '18.4 MB', kind: 'JPEG image' },
-  { name: 'Album Cover.psd', size: '2.3 GB', kind: 'Photoshop' },
-  { name: 'interview-broll.mov', size: '12.4 GB', kind: 'QuickTime movie' },
-  { name: 'Podcast Ep 42.wav', size: '1.1 GB', kind: 'WAVE audio' },
-  { name: 'Budget.xlsx', size: '1.3 MB', kind: 'Spreadsheet' },
-  { name: 'Sample Pack.zip', size: '3.6 GB', kind: 'ZIP archive' },
-  { name: 'Invoice.pdf', size: '3.2 MB', kind: 'PDF' },
-] as const
+import { catalog, formatSize } from '@loft/core'
+
+export const files = catalog.map((file) => ({
+  name: file.name,
+  size: formatSize(file.bytes),
+  kind: file.kind,
+}))
 
 export const steps = [
   {

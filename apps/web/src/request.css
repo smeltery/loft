@@ -1,0 +1,61 @@
+.request {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  background: #f5f5f5;
+}
+.rq-domain {
+  color: #8e8e93;
+  font-size: 13px;
+  margin: 0;
+}
+.rq-title {
+  font-size: 28px;
+  letter-spacing: -0.04em;
+  margin: 0;
+  color: #000;
+  max-width: none;
+}
+.rq-sub,
+.rq-token,
+.rq-size {
+  margin: 0;
+  color: #000000a3;
+  max-width: 36ch;
+}
+.rq-drop {
+  display: grid;
+  place-items: center;
+  width: min(420px, 100%);
+  min-height: 140px;
+  border: 1px dashed #00000024;
+  border-radius: 16px;
+  background: #fff;
+  cursor: pointer;
+}
+.rq-drop input {
+  display: none;
+}
+.rq-file {
+  position: relative;
+  width: min(420px, 100%);
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  max-width: none;
+  color: #000;
+}
+.rq-file i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: #007aff;
+}

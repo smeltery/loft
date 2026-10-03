@@ -51,7 +51,7 @@ repos:
         pass_filenames: false
       - id: shellcheck-hooks
         name: shellcheck hooks
-        entry: shellcheck .githooks/pre-commit .githooks/pre-push
+        entry: shellcheck .githooks/pre-commit .githooks/pre-push scripts/macos-ci.sh scripts/package-macos.sh
         language: system
         pass_filenames: false
 

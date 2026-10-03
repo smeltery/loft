@@ -1,0 +1,14 @@
+{
+  "name": "@loft/core",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "bun test src",
+    "lint": "biome lint src",
+    "typecheck": "tsc --noEmit",
+    "build": "bun -e 'console.log(\"@loft/core build ok\")'"
+  }
+}

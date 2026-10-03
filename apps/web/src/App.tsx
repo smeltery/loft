@@ -7,8 +7,12 @@ import Pricing from './components/pricing'
 import Stories from './components/stories'
 import TopBar from './components/top-bar'
 import { site } from './copy'
+import { RequestPage } from './request-page'
+import { requestToken } from './request-token'
 
 export default function App() {
+  const token = requestToken()
+  if (token) return <RequestPage token={token} />
   return (
     <>
       <TopBar />
