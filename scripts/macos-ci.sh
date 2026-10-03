@@ -11,7 +11,7 @@ fi
 
 cd "$root/apps/macos"
 case "$cmd" in
-  test) swift run LoftKitCheck && swift build --product Loft ;;
-  build) swift build --product Loft ;;
+  test) swift run LoftKitCheck && swift build --product Loft && swift build --product LoftProvider ;;
+  build) swift build --product Loft && swift build --product LoftProvider ;;
   *) echo "usage: $0 test|build" >&2; exit 1 ;;
 esac

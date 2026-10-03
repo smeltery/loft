@@ -1,20 +1,15 @@
-import { site } from '../copy'
-
 export default function TopBar() {
   return (
-    <header className="top">
-      <a className="mark" href="#top">
-        {site.name}
+    <nav className="nav" aria-label="Main">
+      <a href="#top" className="nav-home on" aria-current="location">
+        loft
       </a>
-      <nav>
-        <a href="#how">how</a>
-        <a href="#why">why</a>
-        <a href="#plan">plan</a>
-        <a href="#faq">faq</a>
-      </nav>
-      <a className="btn btn-sm" href={site.downloadHref}>
-        {site.download}
+      <a href="#how">how it works</a>
+      <a href="#pricing">pricing</a>
+      <a href="#faq">faq</a>
+      <a className="nav-account" href="/app">
+        app
       </a>
-    </header>
+    </nav>
   )
 }

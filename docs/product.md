@@ -26,9 +26,9 @@ sequenceDiagram
 
 ## Plan
 
-Storage is $9 per TB per month, from 1 TB to 30 TB. Cancel any time. Files are
-not deleted if billing stops; you cannot add new ones until a plan is active
-again.
+Loft is free. You run the storage API and, if you want object storage in AWS,
+the Terraform in `infra/aws`. There is no billing gate.
 
-macOS 26 Tahoe or newer is required, because loft uses Apple's current drive
-stack.
+macOS 26 Tahoe or newer is what Helumi requires for its File Provider drive.
+Loft’s extension targets the same Finder domain; unsigned local builds still
+mount a Loft volume so the rest of the app runs.

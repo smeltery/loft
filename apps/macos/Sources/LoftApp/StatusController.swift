@@ -10,17 +10,21 @@ final class StatusController: NSObject {
   private let drop: DropPanel
   private let catcher: DropCatcher
 
-  init(drive: URL, onSearch: @escaping () -> Void, onSettings: @escaping () -> Void) {
-    self.drive = drive
+  init(
+    store: DriveStore, client: CloudClient, onSearch: @escaping () -> Void,
+    onSettings: @escaping () -> Void
+  ) {
+    self.drive = store.root
     self.onSearch = onSearch
     self.onSettings = onSettings
-    item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-    drop = DropPanel(drive: drive)
+    item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    drop = DropPanel(store: store, client: client)
     catcher = DropCatcher()
     super.init()
-    item.button?.image = NSImage(
-      systemSymbolName: "externaldrive.fill.badge.icloud",
-      accessibilityDescription: Chrome.brand)
+    let mark = BrandImage.mark()
+    item.button?.image = mark
+    item.button?.imagePosition = .imageOnly
+    item.button?.toolTip = Chrome.brand
     item.menu = buildMenu()
     if let button = item.button {
       catcher.frame = button.bounds
@@ -32,6 +36,8 @@ final class StatusController: NSObject {
     }
   }
 
+  func showDropPreview() { drop.show(count: 1) }
+
   private func buildMenu() -> NSMenu {
     let menu = NSMenu()
     for spec in statusMenu {
@@ -39,7 +45,9 @@ final class StatusController: NSObject {
         menu.addItem(.separator())
         continue
       }
-      let row = NSMenuItem(title: spec.title ?? "", action: #selector(pick), keyEquivalent: "")
+      var title = spec.title ?? ""
+      if let mark = spec.trailing { title += mark }
+      let row = NSMenuItem(title: title, action: #selector(pick), keyEquivalent: "")
       row.target = self
       row.representedObject = spec.id
       switch spec.id {
@@ -65,9 +73,9 @@ final class StatusController: NSObject {
     case "search": onSearch()
     case "finder": NSWorkspace.shared.open(drive)
     case "account":
-      if let url = URL(string: "https://github.com/smeltery/loft") {
-        NSWorkspace.shared.open(url)
-      }
+      let origin = ProcessInfo.processInfo.environment["LOFT_WEB"]
+        ?? "http://127.0.0.1:3000/app"
+      if let url = URL(string: origin) { NSWorkspace.shared.open(url) }
     case "feedback":
       if let url = URL(string: "https://github.com/smeltery/loft/issues") {
         NSWorkspace.shared.open(url)
@@ -93,13 +101,8 @@ final class DropCatcher: NSView {
     return .copy
   }
 
-  override func draggingExited(_ sender: NSDraggingInfo?) {
-    onExit?()
-  }
-
-  override func draggingEnded(_ sender: NSDraggingInfo) {
-    onExit?()
-  }
+  override func draggingExited(_ sender: NSDraggingInfo?) { onExit?() }
+  override func draggingEnded(_ sender: NSDraggingInfo) { onExit?() }
 
   override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
     let urls = sender.draggingPasteboard.readObjects(forClasses: [NSURL.self]) as? [URL] ?? []
@@ -116,7 +119,5 @@ final class DropCatcher: NSView {
 }
 
 extension NSPasteboard {
-  fileprivate var fileCount: Int {
-    pasteboardItems?.count ?? 1
-  }
+  fileprivate var fileCount: Int { pasteboardItems?.count ?? 1 }
 }

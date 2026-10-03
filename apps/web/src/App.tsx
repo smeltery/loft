@@ -9,10 +9,18 @@ import TopBar from './components/top-bar'
 import { site } from './copy'
 import { RequestPage } from './request-page'
 import { requestToken } from './request-token'
+import { SharePage } from './share-page'
+import { shareId } from './share-id'
+import { AppShell } from './app-shell'
+import { appPath } from './app-route'
 
 export default function App() {
   const token = requestToken()
   if (token) return <RequestPage token={token} />
+  const shared = shareId()
+  if (shared) return <SharePage id={shared} />
+  const shell = appPath()
+  if (shell) return <AppShell path={shell} />
   return (
     <>
       <TopBar />
@@ -27,8 +35,8 @@ export default function App() {
         <section className="cta wrap" id="download">
           <h2>stop deleting files to make space.</h2>
           <p>get terabytes of space in finder, today.</p>
-          <a className="btn" href={site.downloadHref}>
-            {site.download}
+          <a className="pill pill-dark" href={site.downloadHref}>
+            download for mac
           </a>
         </section>
       </main>

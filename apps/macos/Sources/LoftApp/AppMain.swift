@@ -6,23 +6,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   private var status: StatusController?
   private var search: SearchPanel?
   private var settings: NSWindow?
+  private var transfer: TransferPanel?
 
   func applicationDidFinishLaunching(_ notification: Notification) {
-    let store = DriveStore(root: DriveStore.defaultRoot())
+    let store = DriveStore(root: LoftVolume.ensure())
     try? store.materialize()
-    let searchPanel = SearchPanel()
+    let cloud = CloudClient.fromEnv()
+    let transfer = TransferPanel()
+    self.transfer = transfer
+    let searchPanel = SearchPanel(store: store, transfer: transfer, client: cloud)
     search = searchPanel
+    SearchHotKey.trigger = { searchPanel.show() }
+    SearchHotKey.install()
+    LoftDomain.register()
     status = StatusController(
-      drive: store.root,
+      store: store,
+      client: cloud,
       onSearch: { searchPanel.show() },
       onSettings: { [weak self] in self?.showSettings() }
     )
+    if CommandLine.arguments.contains("--preview") {
+      searchPanel.show()
+      showSettings()
+      status?.showDropPreview()
+      if let film = Catalog.files.first {
+        transfer.show(file: film)
+      }
+    }
   }
 
   private func showSettings() {
-    if settings == nil {
-      settings = SettingsWindow.make()
-    }
+    if settings == nil { settings = SettingsWindow.make() }
     settings?.makeKeyAndOrderFront(nil)
     NSApp.activate(ignoringOtherApps: true)
   }
@@ -32,11 +46,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 enum LoftMain {
   static func main() {
     let app = NSApplication.shared
-    app.setActivationPolicy(.accessory)
+    app.setActivationPolicy(
+      CommandLine.arguments.contains("--preview") ? .regular : .accessory)
     let delegate = AppDelegate()
     app.delegate = delegate
-    withExtendedLifetime(delegate) {
-      app.run()
-    }
+    withExtendedLifetime(delegate) { app.run() }
   }
 }

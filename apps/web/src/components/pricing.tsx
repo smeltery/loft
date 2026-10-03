@@ -4,7 +4,7 @@ import { clampTb, monthlyUsd } from '../lib/price'
 export default function Pricing() {
   const [tb, setTb] = useState(1)
   return (
-    <section className="plan wrap" id="plan">
+    <section className="plan wrap" id="pricing">
       <h2>one plan. any size.</h2>
       <p>pick the space you need. pay monthly. cancel any time.</p>
       <div className="meter">

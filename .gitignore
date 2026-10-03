@@ -12,3 +12,8 @@ coverage/
 .corepack/
 .build/
 DerivedData/
+.terraform/
+*.tfstate
+*.tfstate.*
+.loft-data/
+crash.log

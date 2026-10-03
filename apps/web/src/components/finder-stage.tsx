@@ -1,58 +1,73 @@
 import { files } from '../copy'
+import { Logo } from '../logo'
+import './finder.css'
 
-const selected = files[0]
+const favs = [
+  'AirDrop',
+  'Recents',
+  'Applications',
+  'Desktop',
+  'Documents',
+  'Downloads',
+]
+const folders = ['Brand', 'Clients', 'Music', 'Archive']
 
 export default function FinderStage() {
-  if (!selected) return null
   return (
-    <div className="window" aria-hidden="true">
-      <div className="traffic">
-        <i />
-        <i />
-        <i />
-        <span>Finder</span>
-      </div>
-      <div className="finder">
-        <aside>
-          <p>Favorites</p>
-          <ul>
-            <li>AirDrop</li>
-            <li>Recents</li>
-            <li>Applications</li>
-            <li>Desktop</li>
-            <li>Documents</li>
-            <li>Downloads</li>
-          </ul>
-          <p>Locations</p>
-          <ul>
-            <li>Macintosh HD</li>
-            <li className="on">Loft</li>
-          </ul>
-        </aside>
-        <ul className="list">
-          {files.map((file) => (
-            <li
-              key={file.name}
-              className={file.name === selected.name ? 'on' : undefined}
-            >
-              <b>{file.name}</b>
-              <span>{file.size}</span>
-            </li>
+    <div className="stage" aria-hidden="true">
+      <div className="f-window">
+        <aside className="f-side">
+          <span className="f-lights">
+            <i />
+            <i />
+            <i />
+          </span>
+          <p className="f-side-head">Favorites</p>
+          {favs.map((name) => (
+            <p key={name} className="f-side-item">
+              <i className="f-dot" />
+              {name}
+            </p>
           ))}
-        </ul>
-        <dl className="info">
-          <dt>Kind</dt>
-          <dd>{selected.kind}</dd>
-          <dt>Size</dt>
-          <dd>48,213,574,021 bytes (Zero bytes on disk)</dd>
-          <dt>Where</dt>
-          <dd>Loft › Client Work</dd>
-          <dt>Created</dt>
-          <dd>Yesterday, 9:42 AM</dd>
-          <dt>Modified</dt>
-          <dd>Today, 10:24 AM</dd>
-        </dl>
+          <p className="f-side-head">Locations</p>
+          <p className="f-side-item">
+            <i className="f-dot" />
+            Macintosh HD
+          </p>
+          <p className="f-side-item on">
+            <Logo className="logo-sm" /> Loft
+          </p>
+        </aside>
+        <div className="f-main">
+          <div className="f-toolbar">
+            <span className="f-nav" />
+            <span className="f-nav" />
+            <b>Client Work</b>
+            <span className="f-tool" />
+            <span className="f-tool" />
+            <span className="f-tool" />
+          </div>
+          <div className="f-grid">
+            {folders.map((name) => (
+              <div key={name} className="f-item">
+                <i className="f-tile folder" />
+                <span className="f-name">{name}</span>
+              </div>
+            ))}
+            {files.map((file) => (
+              <div key={file.name} className="f-item">
+                <i className="f-tile">{ext(file.name)}</i>
+                <span className="f-name">{file.name}</span>
+                <span className="f-size">{file.size}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
+}
+
+function ext(name: string) {
+  return name.split('.').pop()?.toUpperCase() ?? ''
 }

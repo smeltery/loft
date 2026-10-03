@@ -1,0 +1,16 @@
+{
+  "name": "@loft/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "start": "bun src/server.ts",
+    "build": "bun -e 'console.log(\"@loft/api build ok\")'",
+    "test": "bun test src",
+    "lint": "biome lint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@loft/core": "workspace:*"
+  }
+}

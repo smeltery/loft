@@ -1,6 +1,6 @@
 # loft contributor instructions
 
-Loft is a monorepo: marketing site plus macOS menu-bar app. Keep branding loft
+Loft is a monorepo: marketing site, storage API, and macOS menu-bar app. Keep branding loft
 only. Status-menu titles live in `packages/core` and `apps/macos` LoftKit and
 must stay identical.
 

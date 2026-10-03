@@ -56,6 +56,7 @@ jobs:
           persist-credentials: false
       - run: swift run --package-path apps/macos LoftKitCheck
       - run: swift build --package-path apps/macos --product Loft
+      - run: swift build --package-path apps/macos --product LoftProvider
 
   hygiene:
     name: hygiene

@@ -12,6 +12,9 @@
   color: #8e8e93;
   font-size: 13px;
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .rq-title {
   font-size: 28px;

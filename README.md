@@ -11,7 +11,7 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](.pre-commit-config.yaml)
 
 **loft** is a Finder drive: terabytes in the cloud, zero bytes on your Mac. This
-monorepo holds the marketing site and the macOS menu-bar app.
+monorepo holds the marketing site, storage API, and the macOS menu-bar app.
 
 ## Quick start
 
@@ -30,6 +30,7 @@ On a Mac, `bun run macos:build` then `open dist/Loft.app`.
 - [Product](docs/product.md)
 - [Getting started](docs/getting-started.md)
 - [Architecture](docs/architecture.md)
+- [Cloud](docs/cloud.md)
 - [macOS app](docs/macos.md)
 - [Operations](docs/operations/README.md)
 
