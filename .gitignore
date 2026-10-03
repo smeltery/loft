@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.output/
+.DS_Store
+.env
+.env.local
+!.env.example
+.artifacts/
+coverage/
+*.log
+.turbo/
+.corepack/

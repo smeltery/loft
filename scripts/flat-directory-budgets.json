@@ -1,0 +1,9 @@
+{
+  "default_files": 20,
+  "directories": {
+    ".github/workflows": {
+      "limit": 8,
+      "reason": "GitHub keeps workflow files in one folder."
+    }
+  }
+}
