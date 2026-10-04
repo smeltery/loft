@@ -17,12 +17,12 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
 
   public func item(
     for identifier: NSFileProviderItemIdentifier, request: NSFileProviderRequest,
-    completionHandler: @escaping (NSFileProviderItem?, Error?) -> Void
+    completionHandler: @escaping @Sendable (NSFileProviderItem?, Error?) -> Void
   ) -> Progress {
     let progress = Progress(totalUnitCount: 1)
     let client = self.client
     let id = identifier
-    nonisolated(unsafe) let finish = completionHandler
+    let finish = completionHandler
     Task {
       defer { progress.completedUnitCount = 1 }
       if id == .rootContainer {
@@ -48,7 +48,7 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
   public func fetchContents(
     for itemIdentifier: NSFileProviderItemIdentifier, version: NSFileProviderItemVersion?,
     request: NSFileProviderRequest,
-    completionHandler: @escaping (URL?, NSFileProviderItem?, Error?) -> Void
+    completionHandler: @escaping @Sendable (URL?, NSFileProviderItem?, Error?) -> Void
   ) -> Progress {
     fetchPartialContents(
       for: itemIdentifier, version: version ?? NSFileProviderItemVersion(), request: request,
@@ -62,14 +62,14 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
     for itemIdentifier: NSFileProviderItemIdentifier, version: NSFileProviderItemVersion,
     request: NSFileProviderRequest, minimalRange range: NSRange, aligningTo alignment: Int,
     options: NSFileProviderFetchContentsOptions,
-    completionHandler: @escaping (
+    completionHandler: @escaping @Sendable (
       URL?, NSFileProviderItem?, NSRange, NSFileProviderMaterializationFlags, Error?
     ) -> Void
   ) -> Progress {
     let progress = Progress(totalUnitCount: 1)
     let client = self.client
     let itemId = itemIdentifier.rawValue
-    nonisolated(unsafe) let finish = completionHandler
+    let finish = completionHandler
     Task {
       do {
         let files = try await client.list()
@@ -101,7 +101,7 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
   public func createItem(
     basedOn itemTemplate: NSFileProviderItem, fields: NSFileProviderItemFields, contents url: URL?,
     options: NSFileProviderCreateItemOptions, request: NSFileProviderRequest,
-    completionHandler: @escaping (NSFileProviderItem?, NSFileProviderItemFields, Bool, Error?) ->
+    completionHandler: @escaping @Sendable (NSFileProviderItem?, NSFileProviderItemFields, Bool, Error?) ->
       Void
   ) -> Progress {
     let progress = Progress(totalUnitCount: 1)
@@ -111,7 +111,7 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
     let folder = itemTemplate.parentItemIdentifier.rawValue.hasPrefix("folder:")
       ? String(itemTemplate.parentItemIdentifier.rawValue.dropFirst("folder:".count))
       : "Inbox"
-    nonisolated(unsafe) let finish = completionHandler
+    let finish = completionHandler
     nonisolated(unsafe) let template = itemTemplate
     Task {
       defer { progress.completedUnitCount = 1 }
@@ -129,7 +129,7 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
     _ item: NSFileProviderItem, baseVersion: NSFileProviderItemVersion,
     changedFields: NSFileProviderItemFields, contents newContents: URL?,
     options: NSFileProviderModifyItemOptions, request: NSFileProviderRequest,
-    completionHandler: @escaping (NSFileProviderItem?, NSFileProviderItemFields, Bool, Error?) ->
+    completionHandler: @escaping @Sendable (NSFileProviderItem?, NSFileProviderItemFields, Bool, Error?) ->
       Void
   ) -> Progress {
     let progress = Progress(totalUnitCount: 1)
@@ -138,7 +138,7 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
     let id = item.itemIdentifier.rawValue
     let folder = item.parentItemIdentifier.rawValue.hasPrefix("folder:")
       ? String(item.parentItemIdentifier.rawValue.dropFirst("folder:".count)) : "Inbox"
-    nonisolated(unsafe) let finish = completionHandler
+    let finish = completionHandler
     nonisolated(unsafe) let current = item
     Task {
       defer { progress.completedUnitCount = 1 }
@@ -154,12 +154,12 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
   public func deleteItem(
     identifier: NSFileProviderItemIdentifier, baseVersion: NSFileProviderItemVersion,
     options: NSFileProviderDeleteItemOptions, request: NSFileProviderRequest,
-    completionHandler: @escaping (Error?) -> Void
+    completionHandler: @escaping @Sendable (Error?) -> Void
   ) -> Progress {
     let progress = Progress(totalUnitCount: 1)
     let client = self.client
     let id = identifier.rawValue
-    nonisolated(unsafe) let finish = completionHandler
+    let finish = completionHandler
     Task {
       if !id.hasPrefix("folder:") { try? await client.remove(id: id) }
       progress.completedUnitCount = 1
@@ -177,11 +177,11 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
   public func performAction(
     identifier: NSFileProviderExtensionActionIdentifier,
     onItemsWithIdentifiers ids: [NSFileProviderItemIdentifier],
-    completionHandler: @escaping (Error?) -> Void
+    completionHandler: @escaping @Sendable (Error?) -> Void
   ) -> Progress {
     let progress = Progress(totalUnitCount: 1)
     let client = self.client
-    nonisolated(unsafe) let finish = completionHandler
+    let finish = completionHandler
     Task {
       if identifier.rawValue == "dev.smeltery.loft.keep" {
         for id in ids where !id.rawValue.hasPrefix("folder:") {
