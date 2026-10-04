@@ -4,7 +4,6 @@ import LoftKit
 @MainActor
 final class StatusController: NSObject {
   private let item: NSStatusItem
-  private let drive: URL
   private let onSearch: () -> Void
   private let onSettings: () -> Void
   private let drop: DropPanel
@@ -14,7 +13,6 @@ final class StatusController: NSObject {
     store: DriveStore, client: CloudClient, onSearch: @escaping () -> Void,
     onSettings: @escaping () -> Void
   ) {
-    self.drive = store.root
     self.onSearch = onSearch
     self.onSettings = onSettings
     item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -71,7 +69,7 @@ final class StatusController: NSObject {
   @objc private func pick(_ sender: NSMenuItem) {
     switch sender.representedObject as? String {
     case "search": onSearch()
-    case "finder": NSWorkspace.shared.open(drive)
+    case "finder": LoftDomain.openFinder()
     case "account":
       let origin = ProcessInfo.processInfo.environment["LOFT_WEB"]
         ?? "http://127.0.0.1:3000/app"

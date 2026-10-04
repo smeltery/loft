@@ -9,7 +9,10 @@ public final class LoftItem: NSObject, NSFileProviderItem {
   public let filename: String
   public let contentType: UTType
   public let documentSize: NSNumber?
-  public let isDownloaded: Bool
+  public var contentPolicy: NSFileProviderContentPolicy {
+    if LocalPins.contains(itemIdentifier.rawValue) { return .downloadEagerlyAndKeepDownloaded }
+    return itemIdentifier == .rootContainer ? .downloadLazily : .inherited
+  }
   public let itemVersion: NSFileProviderItemVersion
 
   public init(_ file: RemoteFile) {
@@ -18,9 +21,9 @@ public final class LoftItem: NSObject, NSFileProviderItem {
     filename = file.name
     contentType = UTType(filenameExtension: (file.name as NSString).pathExtension) ?? .data
     documentSize = NSNumber(value: file.bytes)
-    isDownloaded = file.kept
     let stamp = Data(file.version.utf8)
-    itemVersion = NSFileProviderItemVersion(contentVersion: stamp, metadataVersion: stamp)
+    let metadata = Data("\(file.version):\(LocalPins.contains(file.id))".utf8)
+    itemVersion = NSFileProviderItemVersion(contentVersion: stamp, metadataVersion: metadata)
   }
 
   public init(folder name: String) {
@@ -29,9 +32,9 @@ public final class LoftItem: NSObject, NSFileProviderItem {
     filename = name
     contentType = .folder
     documentSize = nil
-    isDownloaded = true
     let stamp = Data(name.utf8)
-    itemVersion = NSFileProviderItemVersion(contentVersion: stamp, metadataVersion: stamp)
+    let metadata = Data("\(name):\(LocalPins.contains("folder:\(name)"))".utf8)
+    itemVersion = NSFileProviderItemVersion(contentVersion: stamp, metadataVersion: metadata)
   }
 
   public init(root _: Bool) {
@@ -40,7 +43,6 @@ public final class LoftItem: NSObject, NSFileProviderItem {
     filename = "Loft"
     contentType = .folder
     documentSize = nil
-    isDownloaded = true
     let stamp = Data("loft".utf8)
     itemVersion = NSFileProviderItemVersion(contentVersion: stamp, metadataVersion: stamp)
   }

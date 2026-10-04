@@ -19,16 +19,18 @@ public final class LoftEnumerator: NSObject, NSFileProviderEnumerator, @unchecke
     let container = self.container
     nonisolated(unsafe) let obs = observer
     Task {
-      let files = (try? await client.list()) ?? []
-      if container == .rootContainer {
-        var names = Set(Catalog.folders)
-        files.forEach { names.insert($0.folder) }
-        obs.didEnumerate(names.sorted().map { LoftItem(folder: $0) })
-      } else if container.rawValue.hasPrefix("folder:") {
-        let name = String(container.rawValue.dropFirst("folder:".count))
-        obs.didEnumerate(files.filter { $0.folder == name }.map(LoftItem.init))
-      }
-      obs.finishEnumerating(upTo: nil)
+      do {
+        let files = try await client.list()
+        if container == .rootContainer {
+          var names = Set<String>()
+          files.forEach { names.insert($0.folder) }
+          obs.didEnumerate(names.sorted().map { LoftItem(folder: $0) })
+        } else if container.rawValue.hasPrefix("folder:") {
+          let name = String(container.rawValue.dropFirst("folder:".count))
+          obs.didEnumerate(files.filter { $0.folder == name }.map(LoftItem.init))
+        }
+        obs.finishEnumerating(upTo: nil)
+      } catch { obs.finishEnumeratingWithError(error) }
     }
   }
 }

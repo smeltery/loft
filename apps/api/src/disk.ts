@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, open, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { FileMeta } from './meta'
 import { staleTrash } from './sign'
@@ -76,9 +76,26 @@ export function diskStore(root: string): Store {
     async read(id, start = 0, end?) {
       const meta = await this.get(id)
       if (!meta) return null
-      const buf = await readFile(blobPath(id))
-      const stop = end ?? buf.byteLength - 1
-      return { meta, bytes: buf.subarray(start, stop + 1) }
+      const handle = await open(blobPath(id), 'r')
+      try {
+        const size = (await handle.stat()).size
+        const stop = Math.min(end ?? size - 1, size - 1)
+        const bytes = new Uint8Array(Math.max(0, stop - start + 1))
+        let read = 0
+        while (read < bytes.length) {
+          const result = await handle.read(
+            bytes,
+            read,
+            bytes.length - read,
+            start + read,
+          )
+          if (result.bytesRead === 0) break
+          read += result.bytesRead
+        }
+        return { meta, bytes: bytes.subarray(0, read) }
+      } finally {
+        await handle.close()
+      }
     },
     async remove(id) {
       await ready

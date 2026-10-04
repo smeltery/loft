@@ -21,10 +21,12 @@ public struct Account: Equatable, Sendable, Codable {
 public struct CloudClient: Sendable {
   public let origin: URL
   public let token: String
+  public let session: URLSession
 
-  public init(origin: URL, token: String) {
+  public init(origin: URL, token: String, session: URLSession = .shared) {
     self.origin = origin
     self.token = token
+    self.session = session
   }
 
   public static func fromEnv() -> CloudClient {
@@ -36,19 +38,13 @@ public struct CloudClient: Sendable {
   public static func alignedRange(offset: Int64, requested: Int64, alignment: Int, size: Int64)
     -> (offset: Int64, length: Int64)
   {
-    guard size > 0 else { return (0, 0) }
+    guard size > 0, offset >= 0, offset < size, requested > 0 else { return (0, 0) }
     let a = Int64(max(alignment, 1))
-    let start = min(max(0, (offset / a) * a), size - 1)
-    var len: Int64
-    if requested < 0 || requested == Int64.max {
-      len = min(1_048_576, size - start)
-    } else {
-      len = requested
-    }
-    let rem = len % a
-    if rem != 0 { len += a - rem }
-    if start + len > size { len = size - start }
-    return (start, max(len, 0))
+    let start = (offset / a) * a
+    var end = offset + min(requested, size - offset)
+    let remainder = end % a
+    if remainder != 0 { end += min(a - remainder, size - end) }
+    return (start, end - start)
   }
 
   public func rangeHeader(offset: Int64, length: Int64) -> String {
@@ -63,30 +59,32 @@ public struct CloudClient: Sendable {
   public func list() async throws -> [RemoteFile] {
     var req = URLRequest(url: origin.appendingPathComponent("v1").appendingPathComponent("files"))
     req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-    let (data, _) = try await URLSession.shared.data(for: req)
+    let data = try await send(req)
     return try JSONDecoder().decode(ListBody.self, from: data).files
   }
 
   public func account() async throws -> Account {
     var req = URLRequest(url: origin.appendingPathComponent("v1").appendingPathComponent("me"))
     req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-    let (data, _) = try await URLSession.shared.data(for: req)
+    let data = try await send(req)
     return try JSONDecoder().decode(Account.self, from: data)
   }
 
-  public func fetch(id: String, offset: Int64, length: Int64) async throws -> Data {
+  public func fetch(id: String, offset: Int64, length: Int64, ifMatch: String? = nil) async throws -> Data {
+    guard offset >= 0, length >= 0, offset <= Int64.max - length else { throw URLError(.badURL) }
+    if length == 0 { return Data() }
     var req = URLRequest(url: contentURL(id: id))
     req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     req.setValue(rangeHeader(offset: offset, length: length), forHTTPHeaderField: "Range")
-    let (data, _) = try await URLSession.shared.data(for: req)
+    if let ifMatch { req.setValue(ifMatch, forHTTPHeaderField: "If-Match") }
+    let (data, response) = try await session.data(for: req)
+    let http = try checked(response)
+    let expected = "bytes \(offset)-\(offset + length - 1)/"
+    guard http.statusCode == 206, data.count == length,
+      http.value(forHTTPHeaderField: "Content-Range")?.hasPrefix(expected) == true else {
+      throw URLError(.badServerResponse)
+    }
     return data
-  }
-
-  public func download(id: String, to url: URL) async throws {
-    var req = URLRequest(url: contentURL(id: id))
-    req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-    let (data, _) = try await URLSession.shared.data(for: req)
-    try Placeholder.save(data, to: url)
   }
 
   public func keep(id: String) async throws {
@@ -95,7 +93,7 @@ public struct CloudClient: Sendable {
         .appendingPathComponent(id).appendingPathComponent("keep"))
     req.httpMethod = "POST"
     req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-    _ = try await URLSession.shared.data(for: req)
+    _ = try await send(req)
   }
 
   public func remove(id: String) async throws {
@@ -104,7 +102,7 @@ public struct CloudClient: Sendable {
         .appendingPathComponent(id))
     req.httpMethod = "DELETE"
     req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-    _ = try await URLSession.shared.data(for: req)
+    _ = try await send(req)
   }
 
   public func share(id: String) async throws -> String {
@@ -112,10 +110,7 @@ public struct CloudClient: Sendable {
       url: origin.appendingPathComponent("v1").appendingPathComponent("files")
         .appendingPathComponent(id).appendingPathComponent("share"))
     req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-    let (data, response) = try await URLSession.shared.data(for: req)
-    guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-      throw URLError(.badServerResponse)
-    }
+    let data = try await send(req)
     return try JSONDecoder().decode(ShareBody.self, from: data).url
   }
 
@@ -125,10 +120,7 @@ public struct CloudClient: Sendable {
     req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     req.setValue("application/json", forHTTPHeaderField: "Content-Type")
     req.httpBody = try JSONEncoder().encode(["folder": folder])
-    let (data, response) = try await URLSession.shared.data(for: req)
-    guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-      throw URLError(.badServerResponse)
-    }
+    let data = try await send(req)
     return try JSONDecoder().decode(ShareBody.self, from: data).url
   }
 
@@ -142,7 +134,7 @@ public struct CloudClient: Sendable {
     req.setValue(folder, forHTTPHeaderField: "X-Loft-Folder")
     if let ifMatch { req.setValue(ifMatch, forHTTPHeaderField: "If-Match") }
     req.httpBody = body
-    _ = try await URLSession.shared.data(for: req)
+    _ = try await send(req)
   }
 
   private struct ListBody: Codable { let files: [RemoteFile] }
