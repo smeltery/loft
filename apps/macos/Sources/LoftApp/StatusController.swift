@@ -23,6 +23,8 @@ final class StatusController: NSObject {
     item.button?.image = mark
     item.button?.imagePosition = .imageOnly
     item.button?.toolTip = Chrome.brand
+    item.button?.setAccessibilityLabel("Loft")
+    item.button?.setAccessibilityIdentifier("dev.smeltery.loft.status")
     item.menu = buildMenu()
     if let button = item.button {
       catcher.frame = button.bounds
@@ -44,7 +46,7 @@ final class StatusController: NSObject {
         continue
       }
       var title = spec.title ?? ""
-      if let mark = spec.trailing { title += mark }
+      if let mark = spec.trailing { title += "\u{2002}\(mark)" }
       let row = NSMenuItem(title: title, action: #selector(pick), keyEquivalent: "")
       row.target = self
       row.representedObject = spec.id

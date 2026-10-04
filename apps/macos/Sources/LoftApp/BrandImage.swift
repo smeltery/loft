@@ -26,6 +26,11 @@ enum BrandImage {
 
   @MainActor
   static func updateApplicationIcon() {
+    // Asset-catalog icons let macOS apply Dark, Clear, and Tinted appearances.
+    if Bundle.main.object(forInfoDictionaryKey: "CFBundleIconName") != nil {
+      NSApp.applicationIconImage = nil
+      return
+    }
     let dark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
     let name = dark ? "appicon-dark" : "appicon"
     guard let url = url(name), let image = NSImage(contentsOf: url) else {

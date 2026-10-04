@@ -102,3 +102,12 @@ for (size, baseline, height) in [("S", 698.66, 70.46), ("M", 1128.66, 88.0), ("L
 let symbol = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 3300 2200\"><g id=\"Guides\">\(guides)</g><g id=\"Symbols\">\(variants)</g></svg>"
 try (symbol + "\n").write(to: symbols.appendingPathComponent("LoftSidebar.svg"), atomically: true, encoding: .utf8)
 print("Generated Loft icons from apps/web/public/brand/logo.svg")
+
+// Keep the layered app icon's foreground aligned with the canonical mark.
+let layered = resources.appendingPathComponent("Loft.icon/Assets")
+try FileManager.default.createDirectory(at: layered, withIntermediateDirectories: true)
+let iconScale = 800.0 / 1434
+let iconX = 112 - 307 * iconScale
+let iconY = (1024 - 1063 * iconScale) / 2 - 495 * iconScale
+let foreground = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1024\" height=\"1024\" viewBox=\"0 0 1024 1024\"><path fill=\"black\" fill-rule=\"evenodd\" transform=\"translate(\(iconX) \(iconY)) scale(\(iconScale))\" d=\"\(paths.joined(separator: " "))\"/></svg>"
+try (foreground + "\n").write(to: layered.appendingPathComponent("logo.svg"), atomically: true, encoding: .utf8)
