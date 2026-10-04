@@ -256,3 +256,78 @@
   font-weight: 590;
   letter-spacing: -0.03em;
 }
+
+.app-body .account-action {
+  background: var(--ink);
+  color: var(--on-ink);
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  justify-self: start;
+  flex: none;
+}
+.app-body .account-action:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.account-files {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+.app-body .row-text {
+  overflow-wrap: anywhere;
+}
+.account-form {
+  display: grid;
+  gap: 10px;
+  font-size: 13px;
+}
+.account-form input {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+@media (max-width: 360px) {
+  .dock a {
+    width: 52px;
+  }
+}
+.app-body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable",
+    sans-serif;
+  line-height: 1.5;
+}
+.app-body p {
+  max-width: none;
+  margin: 0;
+}
+.app-body .account-heading {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: normal;
+  color: var(--ink-3);
+  margin: 0;
+}
+.app-body .big-num {
+  color: var(--ink);
+}
+.app-body .card-title h2 {
+  line-height: 1.2;
+}
+.account-link {
+  font-size: 13px;
+  font-weight: 500;
+}

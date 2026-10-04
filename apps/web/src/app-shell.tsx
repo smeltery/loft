@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
-import { formatSize } from '@loft/core'
+import { AccountPage } from './account/overview'
+import { DeletedPage } from './account/deleted'
+import { SettingsPage } from './account/settings'
+import { savedToken } from './account/api'
 import { Logo } from './logo'
 import { site } from './copy'
 import { apiOrigin } from './share-id'
@@ -13,7 +16,6 @@ const tabs: { href: string; label: string; sep?: boolean }[] = [
   { href: '/app/deleted', label: 'deleted', sep: true },
 ]
 
-type Me = { email: string; files: number; bytes: number }
 type Remote = { id: string; name: string; folder: string }
 
 function headers() {
@@ -25,6 +27,7 @@ function headers() {
 }
 
 export function AppShell({ path }: { path: string }) {
+  const [token, setToken] = useState(savedToken)
   return (
     <div className="app-body">
       <header className="a-top">
@@ -33,8 +36,16 @@ export function AppShell({ path }: { path: string }) {
           <span>{site.name}</span>
         </a>
       </header>
-      <main className="a-main">{page(path)}</main>
-      <TokenField />
+      <main className="a-main">
+        <h1 className="account-heading">
+          {path.startsWith('/app/deleted')
+            ? 'recently deleted'
+            : path.startsWith('/app/sharing')
+              ? 'sharing'
+              : (tabs.find((tab) => tab.href === path)?.label ?? 'account')}
+        </h1>
+        {page(path, token, setToken)}
+      </main>
       <nav className="dock" aria-label="main">
         {tabs.map((tab) => (
           <span key={tab.href} className="dock-wrap">
@@ -53,42 +64,17 @@ export function AppShell({ path }: { path: string }) {
   )
 }
 
-function TokenField() {
-  const [value, setValue] = useState('dev')
-  useEffect(() => {
-    setValue(localStorage.getItem('loft-token') ?? 'dev')
-  }, [])
-  return (
-    <form
-      className="banner"
-      onSubmit={(e) => {
-        e.preventDefault()
-        localStorage.setItem('loft-token', value)
-      }}
-    >
-      <label>
-        token
-        <input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          autoComplete="off"
-        />
-      </label>
-    </form>
-  )
-}
-
 function DockIcon({ name }: { name: string }) {
   const d =
     name === 'account'
-      ? 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4 0-8 2-8 6v1h16v-1c0-4-4-6-8-6Z'
+      ? 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0ZM15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM5.5 19c2-4 11-4 13 0'
       : name === 'plan'
-        ? 'M4 6h16v12H4Zm2 3h12M6 12h8'
+        ? 'm3 7 9-5 9 5-9 5-9-5Zm0 5 9 5 9-5M3 17l9 5 9-5'
         : name === 'shared'
-          ? 'M8 12a3 3 0 1 0-3-3 3 3 0 0 0 3 3Zm11 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3ZM3 19c0-2.5 2.2-4 5-4s5 1.5 5 4M13 19c0-1.6.7-2.8 2-3.5 1.2-.6 2.7-.5 4 .5'
+          ? 'm10 13 4-4M8 15l-2 2a4 4 0 0 0 6 5l4-4a4 4 0 0 0-5-6M16 9l2-2a4 4 0 0 0-6-5L8 6a4 4 0 0 0 5 6'
           : name === 'settings'
             ? 'M12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4Zm9 4-2-.6a7 7 0 0 0-.4-1l1.3-1.7-2-2-1.7 1.3a7 7 0 0 0-1-.4L14 3h-4l-.6 2.2a7 7 0 0 0-1 .4L6.7 4.3l-2 2 1.3 1.7a7 7 0 0 0-.4 1L3 12l2.2.6a7 7 0 0 0 .4 1L4.3 15.3l2 2 1.7-1.3a7 7 0 0 0 1 .4L10 21h4l.6-2.2a7 7 0 0 0 1-.4l1.7 1.3 2-2-1.3-1.7a7 7 0 0 0 .4-1Z'
-            : 'M7 7h10v10H7Zm3 12h4'
+            : 'M3 5h18M9 5V2h6v3M5 5l1 15a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-15M9 9v8M15 9v8'
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
       <path
@@ -103,56 +89,14 @@ function DockIcon({ name }: { name: string }) {
   )
 }
 
-function page(path: string) {
+function page(path: string, token: string, setToken: (token: string) => void) {
   if (path.startsWith('/app/plan')) return <PlanPage />
   if (path.startsWith('/app/sharing')) return <FileList trash={false} />
-  if (path.startsWith('/app/settings')) return <SettingsPage />
-  if (path.startsWith('/app/deleted')) return <FileList trash />
-  return <AccountPage />
-}
-
-function AccountPage() {
-  const [me, setMe] = useState<Me | null>(null)
-  useEffect(() => {
-    fetch(`${apiOrigin()}/v1/me`, { headers: headers() })
-      .then((res) => (res.ok ? (res.json() as Promise<Me>) : null))
-      .then((row) => {
-        if (row) setMe(row)
-      })
-      .catch(() => undefined)
-  }, [])
-  return (
-    <>
-      <article className="card profile">
-        <span className="avatar lg">L</span>
-        <div className="row-text">
-          <span className="t">you</span>
-          <span className="s">{me?.email ?? 'hello@loft.app'}</span>
-        </div>
-      </article>
-      <article className="card">
-        <div className="card-title">
-          <h2>storage</h2>
-        </div>
-        <p className="big-num">
-          {me ? formatSize(me.bytes) : '1.2 TB'} <small>in the cloud</small>
-        </p>
-        <div className="meter lg">
-          <i style={{ width: '12%' }} />
-        </div>
-        <p className="kv">
-          <span>this Mac</span>
-          <span>Zero KB</span>
-        </p>
-      </article>
-      <p className="banner">
-        this loft is free. run the api, then get loft on your mac.
-        <a className="pill pill-dark" href="/app/plan">
-          plan
-        </a>
-      </p>
-    </>
-  )
+  if (path.startsWith('/app/settings'))
+    return <SettingsPage token={token} onSave={setToken} />
+  if (path.startsWith('/app/deleted'))
+    return <DeletedPage key={token} token={token} />
+  return <AccountPage key={token} token={token} />
 }
 
 function PlanPage() {
@@ -166,29 +110,6 @@ function PlanPage() {
         <span className="muted">you run the storage api</span>
       </p>
       <p className="faint">S3 optional · disk backend by default</p>
-    </article>
-  )
-}
-
-function SettingsPage() {
-  return (
-    <article className="card">
-      <div className="card-title">
-        <h2>Finder</h2>
-      </div>
-      <p className="muted">Loft sits in Locations, next to Macintosh HD.</p>
-      <div className="row">
-        <div className="row-text">
-          <span className="t">keep new folders on this Mac</span>
-          <span className="s">off until you choose a folder in Finder</span>
-        </div>
-        <button
-          type="button"
-          className="toggle"
-          role="switch"
-          aria-checked="false"
-        />
-      </div>
     </article>
   )
 }

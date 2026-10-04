@@ -53,8 +53,9 @@ describe('account app', () => {
   test('account shell uses the product mark and loft copy', () => {
     const html = renderToString(<AppShell path="/app" />)
     expect(html).toContain('/brand/logo.svg')
-    expect(html).toContain('Zero KB')
-    expect(html).toContain('1.2 TB')
+    expect(html).toContain('loading your account')
+    expect(html).not.toContain('1.2 TB')
+    expect(html).not.toContain('Zero KB')
     expect(html.toLowerCase()).not.toContain('helumi')
   })
 })
