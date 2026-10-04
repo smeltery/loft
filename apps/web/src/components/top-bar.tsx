@@ -5,7 +5,7 @@ export default function TopBar() {
         loft
       </a>
       <a href="#how">how it works</a>
-      <a href="#pricing">pricing</a>
+      <a href="#pricing">plan</a>
       <a href="#faq">faq</a>
       <a className="nav-account" href="/app">
         app

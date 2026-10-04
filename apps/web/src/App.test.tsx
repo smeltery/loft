@@ -17,6 +17,11 @@ describe('marketing page', () => {
     expect(html).toContain('without')
     expect(html).toContain('Client Work')
     expect(html).toContain('download for mac')
+    expect(html).toContain('free forever')
+    expect(html).toContain('privacy')
+    expect(html).toContain('orbit-mark')
+    expect(html).toContain('forest-6')
+    expect(html).toContain('How loft looks in finder')
     expect(html.toLowerCase()).not.toContain('helumi')
     expect(html).toContain(faqs[0]?.q)
   })
@@ -33,7 +38,7 @@ describe('request files', () => {
   test('landing copy is loft-branded', () => {
     const html = renderToString(<RequestPage token="demo" />)
     expect(html).toContain('Files you add go straight to their Loft.')
-    expect(html).toContain('/brand/logo.png')
+    expect(html).toContain('/brand/logo.svg')
     expect(html.toLowerCase()).not.toContain('helumi')
   })
 
@@ -47,7 +52,7 @@ describe('request files', () => {
 describe('account app', () => {
   test('account shell uses the product mark and loft copy', () => {
     const html = renderToString(<AppShell path="/app" />)
-    expect(html).toContain('/brand/logo.png')
+    expect(html).toContain('/brand/logo.svg')
     expect(html).toContain('Zero KB')
     expect(html).toContain('1.2 TB')
     expect(html.toLowerCase()).not.toContain('helumi')

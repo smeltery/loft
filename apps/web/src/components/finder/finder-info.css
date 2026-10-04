@@ -1,0 +1,228 @@
+.f-menu {
+  z-index: 4;
+  pointer-events: none;
+  position: absolute;
+  top: 88px;
+  right: 44px;
+  width: 280px;
+  padding: 7px;
+  font-size: 12px;
+  background: #f1f1f3e0;
+  border: 1px solid #0000001a;
+  border-radius: 14px;
+  backdrop-filter: blur(26px) saturate(1.25);
+  opacity: 0;
+  transform: translateY(6px) scale(0.97);
+  transform-origin: 84% 8%;
+  transition:
+    opacity 0.24s var(--ease-out),
+    transform 0.28s var(--ease-out);
+}
+.story[data-step="2"] .f-menu {
+  opacity: 1;
+  transform: none;
+}
+.f-menu p {
+  margin: 0;
+  height: 27px;
+  padding: 0 10px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: none;
+  color: #1d1d1f;
+  white-space: nowrap;
+}
+.f-menu > i {
+  display: block;
+  height: 1px;
+  margin: 4px 6px;
+  background: #0000001c;
+}
+.f-menu-get-info {
+  background: #ffffff75;
+}
+.f-menu-tags {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  padding: 6px 0;
+}
+.f-menu-tags b {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #c7c7cc;
+}
+.f-menu-tags b:nth-child(2) {
+  background: #ff453a;
+}
+.f-menu-tags b:nth-child(3) {
+  background: #ff9f0a;
+}
+.f-menu-tags b:nth-child(4) {
+  background: #ffd60a;
+}
+.f-menu-tags b:nth-child(5) {
+  background: #30d158;
+}
+.f-menu-tags b:nth-child(6) {
+  background: #0a84ff;
+}
+.f-menu-tags b:nth-child(7) {
+  background: #bf5af2;
+}
+.f-info {
+  z-index: 5;
+  pointer-events: none;
+  position: absolute;
+  top: 46px;
+  right: 16px;
+  width: 340px;
+  font-size: 11px;
+  background: #f1f1f3e6;
+  border: 1px solid #0000001a;
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(26px) saturate(1.25);
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  transform-origin: 30% 20%;
+  transition:
+    opacity 0.35s var(--ease-out),
+    transform 0.45s var(--ease-out);
+}
+.story[data-step="3"] .f-info {
+  opacity: 1;
+  transform: none;
+}
+.f-info-bar {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 12px;
+  background: #ececeeb8;
+  border-bottom: 1px solid #0000000e;
+}
+.f-info-bar .f-lights {
+  position: absolute;
+  left: 12px;
+}
+.f-info-bar .f-still {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+}
+.f-info-bar b {
+  max-width: 230px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.f-info-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #f7f7f86b;
+}
+.f-info-head .f-still {
+  width: 44px;
+  height: 30px;
+  border-radius: 3px;
+  flex: none;
+}
+.f-info-head div {
+  min-width: 0;
+}
+.f-info-head b {
+  display: block;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.f-info-head span {
+  color: #6e6e73;
+  font-size: 10.5px;
+}
+.f-info-size {
+  margin-left: auto;
+  align-self: flex-start;
+  flex: none;
+}
+.f-info-tags {
+  color: #b0b0b5;
+  background: #fafafa66;
+  border-top: 1px solid #00000012;
+  padding: 7px 14px;
+  margin: 0;
+  max-width: none;
+}
+.f-info-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid #00000012;
+  padding: 6px 14px;
+  margin: 0;
+  font-weight: 600;
+  max-width: none;
+}
+.f-info-section span {
+  color: #8e8e93;
+  width: 8px;
+  font-weight: 400;
+}
+.f-info-section.open span {
+  transform: rotate(90deg);
+}
+.f-info dl {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 4px 8px;
+  margin: 0;
+  padding: 3px 14px 8px;
+  line-height: 1.38;
+}
+.f-info dt {
+  color: #6e6e73;
+}
+.f-info dd {
+  margin: 0;
+}
+.f-info mark {
+  background: linear-gradient(transparent 55%, #00000029 55%);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 0.1em;
+}
+.f-info-checks {
+  display: flex;
+  gap: 16px;
+  padding: 2px 14px 10px;
+  color: #3a3a3c;
+}
+.f-info-checks span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.f-info-checks i {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #00000033;
+  border-radius: 3px;
+  background: #fff;
+}
+@media (max-width: 800px) {
+  .f-menu,
+  .f-info {
+    display: none;
+  }
+}

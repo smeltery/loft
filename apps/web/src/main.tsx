@@ -1,6 +1,6 @@
+import './styles.css'
 import { createRoot } from 'react-dom/client'
 import App from './App'
-import './styles.css'
 import '@fontsource-variable/inter'
 
 const root = document.getElementById('root')

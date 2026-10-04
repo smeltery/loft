@@ -1,36 +1,41 @@
-import { useState } from 'react'
-import { clampTb, monthlyUsd } from '../lib/price'
+import { site } from '../copy'
+import { AppleLogo } from './apple-logo'
+import './pricing.css'
 
 export default function Pricing() {
-  const [tb, setTb] = useState(1)
   return (
-    <section className="plan wrap" id="pricing">
-      <h2>one plan. any size.</h2>
-      <p>pick the space you need. pay monthly. cancel any time.</p>
-      <div className="meter">
-        <button
-          type="button"
-          aria-label="less storage"
-          onClick={() => setTb(clampTb(tb - 1))}
-        >
-          −
-        </button>
-        <p className="tb">
-          <strong>{tb} TB</strong>
-          of storage
+    <section className="section wrap centered" id="pricing">
+      <h2>
+        free. <em>any size</em>.
+      </h2>
+      <p className="body">run loft yourself. store files on your own cloud.</p>
+      <div className="price-card">
+        <div className="price-top">
+          <span>loft</span>
+          <span className="price-badge">free forever</span>
+        </div>
+        <p className="price-value">
+          <strong>$0</strong>
+          <span>/ month</span>
         </p>
-        <button
-          type="button"
-          aria-label="more storage"
-          onClick={() => setTb(clampTb(tb + 1))}
-        >
-          +
-        </button>
+        <p className="price-caption">
+          all the space you need. all the features included.
+        </p>
+        <ul className="price-features">
+          <li>your files, in your own cloud</li>
+          <li>open big files instantly in finder</li>
+          <li>share links and request files from anyone</li>
+          <li>keep folders on your mac for offline access</li>
+          <li>free and open source</li>
+        </ul>
+        <a className="pill pill-dark price-go" href={site.downloadHref}>
+          <AppleLogo />
+          download for mac
+        </a>
+        <p className="price-note">
+          self-host loft. only pay your cloud provider for the storage you use.
+        </p>
       </div>
-      <p className="price">${monthlyUsd(tb)} per month</p>
-      <p className="fine">
-        $9 per TB a month. prices in USD, plus local tax where it applies.
-      </p>
     </section>
   )
 }

@@ -1,0 +1,71 @@
+@media (max-width: 560px) {
+  .mb-menubar {
+    height: 5cqw;
+    font-size: 2.4cqw;
+  }
+  .mb-menubar svg {
+    width: 2.2cqw;
+    height: 2.6cqw;
+  }
+  .scr-notif,
+  .scr-prog,
+  .scr-alert {
+    font-size: 2.9cqw;
+  }
+  .scr-notif {
+    border-radius: 3cqw;
+    gap: 1.8cqw;
+    width: 70cqw;
+    padding: 2cqw;
+    top: 7cqw;
+    right: 3cqw;
+  }
+  .scr-notif-app {
+    border-radius: 1.6cqw;
+    width: 7cqw;
+    height: 7cqw;
+  }
+  .scr-notif-app svg {
+    width: 3.4cqw;
+    height: 3.4cqw;
+  }
+  .scr-notif small,
+  .scr-prog small {
+    font-size: 2.5cqw;
+  }
+  .scr-prog {
+    border-radius: 2.6cqw;
+    width: 68cqw;
+    padding: 2.6cqw 3cqw;
+    top: 23cqw;
+    left: 3cqw;
+  }
+  .scr-thumb {
+    width: 6.6cqw;
+    height: 4.5cqw;
+  }
+  .scr-prog-bar {
+    height: 1cqw;
+    margin: 2cqw 0 1.3cqw;
+  }
+  .scr-alert {
+    border-radius: 3.4cqw;
+    gap: 1cqw;
+    width: 52cqw;
+    padding: 2.6cqw;
+    top: 42cqw;
+    left: auto;
+    right: 3cqw;
+  }
+  .scr-alert-icon,
+  .scr-alert > span:not([class]) {
+    display: none;
+  }
+  .scr-alert-btns {
+    gap: 1.6cqw;
+    margin-top: 1.4cqw;
+  }
+  .scr-alert-btns i {
+    padding: 1cqw 0;
+  }
+}

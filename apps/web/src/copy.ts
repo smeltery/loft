@@ -15,23 +15,48 @@ export const files = catalog.map((file) => ({
   kind: file.kind,
 }))
 
-export const steps = [
+export const notes: {
+  n: string
+  title: string
+  lead?: string
+  paras?: string[]
+  facts?: boolean
+  steps?: string[]
+  perks?: boolean
+}[] = [
   {
     n: '1',
     title: 'what it is',
-    body: 'a new drive in finder, with terabytes of space. it sits right next to macintosh hd. your files look and open like normal, in the apps you already use. but they live in the cloud, so a 50 GB film takes no space on your mac.',
+    lead: 'a new drive in finder, with terabytes of space.',
+    paras: [
+      'it sits right next to macintosh hd. your files look and open like normal, in the apps you already use.',
+      'but they live in the cloud, so a 50 GB film takes no space on your mac.',
+    ],
   },
   {
     n: '2',
     title: 'why it’s different',
-    body: 'icloud and dropbox download the whole file before you can open it. then it stays and fills up your mac. loft only grabs the part you’re watching. hit play on a huge video and it starts right away.',
+    paras: [
+      'icloud and dropbox download the whole file before you can open it. then it stays and fills up your mac.',
+      'loft only grabs the part you’re watching. hit play on a huge video and it starts right away.',
+    ],
+    facts: true,
   },
   {
     n: '3',
     title: 'how it works',
-    body: 'install loft. it lives in your menu bar. open the loft drive in finder. drag in your biggest files. done.',
+    steps: [
+      'install loft. it lives in your menu bar.',
+      'open the loft drive in finder.',
+      'drag in your biggest files. done.',
+    ],
   },
-] as const
+  {
+    n: '4',
+    title: 'what you get',
+    perks: true,
+  },
+]
 
 export const stats = [
   { value: '0 bytes', label: 'used on your mac' },
@@ -78,20 +103,32 @@ export const stories = [
   },
 ] as const
 
+export type CmpValue = true | false | 'partly'
+
 export const compare = {
   columns: ['loft', 'icloud', 'google drive', 'dropbox'] as const,
   rows: [
     {
       label: 'opens big files without downloading them first',
-      values: [true, false, false, false] as const,
+      values: [true, false, true, false] as const satisfies readonly CmpValue[],
     },
     {
       label: 'watching a film doesn’t fill up your mac',
-      values: [true, false, true, false] as const,
+      values: [
+        true,
+        false,
+        'partly',
+        false,
+      ] as const satisfies readonly CmpValue[],
     },
     {
       label: 'made just for the mac, as a real drive in finder',
-      values: [true, false, false, false] as const,
+      values: [
+        true,
+        false,
+        false,
+        false,
+      ] as const satisfies readonly CmpValue[],
     },
   ],
 }
@@ -119,11 +156,11 @@ export const faqs = [
   },
   {
     q: 'how does loft protect my files?',
-    a: 'your files are encrypted and stored with cloudflare, and always sent over a secure connection. deleted files stay for 30 days, and edits on two macs never overwrite each other.',
+    a: 'your files live in your own cloud bucket, encrypted in transit, and always sent over a secure connection. deleted files stay for 30 days, and edits on two macs never overwrite each other.',
   },
   {
-    q: 'what happens if i stop paying?',
-    a: 'we never delete your files. you just can’t add new ones until you pick a plan again.',
+    q: 'is loft really free?',
+    a: 'yes. loft is free and open source. you run it yourself and only pay your cloud provider for the storage you use.',
   },
   {
     q: 'what are the system requirements?',

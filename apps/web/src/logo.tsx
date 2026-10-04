@@ -1,10 +1,18 @@
-export function Logo({ className }: { className?: string }) {
+export function Logo({
+  className,
+  width,
+  height,
+}: {
+  className?: string
+  width?: number
+  height?: number
+}) {
   return (
     <img
       className={className ?? 'logo'}
-      src="/brand/logo.png"
-      width={24}
-      height={18}
+      src="/brand/logo.svg"
+      width={width ?? 24}
+      height={height ?? 18}
       alt=""
     />
   )
