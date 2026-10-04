@@ -20,14 +20,21 @@ cp Info-provider.plist "$appex/Info.plist"
 mkdir -p "$appex/Resources"
 cp "$root/apps/macos/Resources/Loft.icns" "$appex/Resources/"
 if xcrun --find actool >/dev/null 2>&1; then
+  partial="$(mktemp -t loft-icon-plist)"
+  trap 'rm -f "$partial"' EXIT
+  xcrun actool "$root/apps/macos/Resources/Loft.icon" \
+    --compile "$dest/Resources" --platform macosx --minimum-deployment-target 14.0 \
+    --target-device mac --app-icon Loft --output-partial-info-plist "$partial" \
+    --output-format human-readable-text
+  /usr/libexec/PlistBuddy -c "Merge $partial" "$dest/Info.plist"
   xcrun actool "$root/apps/macos/Resources/Brand.xcassets" \
     --compile "$appex/Resources" --platform macosx --minimum-deployment-target 14.0 \
     --target-device mac --output-format human-readable-text
 else
   # Command Line Tools omit actool; never claim the sidebar symbol was built.
-  rm -f "$appex/Resources/Assets.car"
+  rm -f "$appex/Resources/Assets.car" "$dest/Resources/Assets.car"
   /usr/libexec/PlistBuddy -c 'Delete :CFBundleIcons' "$appex/Info.plist"
-  echo "warning: Finder sidebar symbol requires full Xcode; using the bundle icon fallback" >&2
+  echo "warning: layered app icon and Finder symbol require Xcode 26+; using legacy icons" >&2
 fi
 if command -v codesign >/dev/null; then
   codesign --force --sign - --entitlements LoftProvider.entitlements "$dest/PlugIns/LoftProvider.appex"

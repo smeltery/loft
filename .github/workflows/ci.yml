@@ -47,6 +47,8 @@ jobs:
       - run: bun run build
 
   macos:
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
     name: macos
     runs-on: macos-15
     timeout-minutes: 20
@@ -61,8 +63,17 @@ jobs:
         run: |
           xcrun --find actool
           bash scripts/package-macos.sh
+          test -s dist/Loft.app/Contents/Resources/Assets.car
           test -s dist/Loft.app/Contents/Resources/Loft.icns
           test -s dist/Loft.app/Contents/PlugIns/LoftProvider.appex/Contents/Resources/Assets.car
+
+      - name: Archive the verified macOS app
+        run: ditto -c -k --keepParent dist/Loft.app loft-macos.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: loft-macos
+          path: loft-macos.zip
+          retention-days: 7
 
   hygiene:
     name: hygiene
