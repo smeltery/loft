@@ -1,0 +1,74 @@
+.sharing-tabs {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  display: inline-flex;
+  justify-self: start;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--accent-tint);
+}
+.sharing-tabs button {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-2);
+  padding: 0 12px;
+  height: 32px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.sharing-tabs button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+}
+.sharing-row {
+  display: grid;
+  gap: 12px;
+}
+.sharing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.app-body .account-action.secondary {
+  background: var(--accent-tint);
+  color: var(--ink);
+}
+.sharing-notice {
+  overflow-wrap: anywhere;
+}
+
+.sharing-empty {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding: 32px 16px;
+  gap: 12px;
+}
+.sharing-empty h3 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.app-body .sharing-empty p {
+  max-width: 340px;
+}
+.sharing-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink-3);
+}
+.account-page-head {
+  display: grid;
+  gap: 2px;
+  padding: 0 4px;
+}

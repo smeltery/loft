@@ -12,7 +12,7 @@ export async function accountRequest<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const headers = new Headers(options.headers)
-  headers.set('authorization', `Bearer ${token}`)
+  if (token) headers.set('authorization', `Bearer ${token}`)
   const response = await fetch(`${apiOrigin()}${path}`, { ...options, headers })
   if (!response.ok) {
     if (response.status === 401) {

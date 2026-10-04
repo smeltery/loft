@@ -44,8 +44,8 @@ describe('request files', () => {
 
   test('share page streams from the storage api', () => {
     const html = renderToString(<SharePage id="clip" />)
-    expect(html).toContain('clip')
-    expect(html).toContain('127.0.0.1:8787/s/clip')
+    expect(html).toContain('loading shared file')
+    expect(html).not.toContain('<video')
   })
 })
 

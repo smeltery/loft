@@ -10,7 +10,7 @@ import {
   safeId,
 } from './meta'
 import { s3Store } from './s3'
-import { shareLink, shareOk, signingKey } from './sign'
+import { publicSharing, sharingRoutes } from './sharing'
 
 const port = Number(process.env.PORT ?? 8787)
 const origin = process.env.LOFT_ORIGIN ?? `http://127.0.0.1:${port}`
@@ -32,7 +32,15 @@ export function makeStore(): Store {
 }
 
 export function handle(req: Request, store: Store): Promise<Response> {
-  return route(req, store).then(cors)
+  return route(req, store)
+    .catch((error: unknown) => {
+      console.error(
+        'Storage request failed',
+        error instanceof Error ? error.message : 'unknown error',
+      )
+      return json({ error: { code: 'STORAGE_ERROR' } }, 500)
+    })
+    .then(cors)
 }
 
 async function route(req: Request, store: Store): Promise<Response> {
@@ -40,39 +48,18 @@ async function route(req: Request, store: Store): Promise<Response> {
   const url = new URL(req.url)
   const path = url.pathname
   if (req.method === 'GET' && path === '/health') return json({ ok: true })
-  const share = /^\/s\/([^/]+)(\/meta)?$/.exec(path)
-  if (req.method === 'GET' && share?.[1]) {
-    if (!safeId(share[1])) return json({ error: { code: 'NOT_FOUND' } }, 404)
-    if (
-      !shareOk(
-        share[1],
-        url.searchParams.get('exp'),
-        url.searchParams.get('sig'),
-        signingKey,
-      )
-    ) {
-      return json({ error: { code: 'UNAUTHORIZED' } }, 401)
-    }
-    if (share[2]) {
-      const meta = await store.get(share[1])
-      if (!meta || meta.deletedAt)
-        return json({ error: { code: 'NOT_FOUND' } }, 404)
-      return json({
-        id: meta.id,
-        name: meta.name,
-        bytes: meta.bytes,
-        kind: meta.kind,
-      })
-    }
-    return content(store, share[1], req.headers.get('range') ?? undefined)
-  }
-  if (req.method === 'PUT' && path.startsWith('/r/')) {
-    const tokenId = path.slice(3)
-    if (!safeId(tokenId)) return json({ error: { code: 'NOT_FOUND' } }, 404)
-    const id = `r-${tokenId}-${crypto.randomUUID().slice(0, 8)}`
-    return upload(store, id, req, 'Requests')
-  }
+  const publicResponse = await publicSharing(req, store, {
+    content: (id, range) => content(store, id, range),
+    upload: (id, request, folder) => upload(store, id, request, folder),
+  })
+  if (publicResponse) return publicResponse
   if (!bearer(req)) return json({ error: { code: 'UNAUTHORIZED' } }, 401)
+  const sharing = await sharingRoutes(
+    req,
+    store,
+    process.env.LOFT_WEB ?? origin,
+  )
+  if (sharing) return sharing
   if (req.method === 'GET' && path === '/v1/me') {
     const files = await store.list()
     return json({
@@ -101,13 +88,6 @@ async function route(req: Request, store: Store): Promise<Response> {
     const row = await store.restore(action[1])
     return row ? json(row) : json({ error: { code: 'NOT_FOUND' } }, 404)
   }
-  if (action?.[1] && action[2] === 'share' && req.method === 'GET') {
-    const meta = await store.get(action[1])
-    if (!meta || meta.deletedAt)
-      return json({ error: { code: 'NOT_FOUND' } }, 404)
-    const web = process.env.LOFT_WEB ?? origin
-    return json(shareLink(web, action[1], signingKey))
-  }
   const file = /^\/v1\/files\/([^/]+)(\/content)?$/.exec(path)
   const id = file?.[1]
   if (!id || !safeId(id)) return json({ error: { code: 'NOT_FOUND' } }, 404)
@@ -133,7 +113,7 @@ async function upload(
   store: Store,
   id: string,
   req: Request,
-  folder = req.headers.get('x-loft-folder') ?? 'Inbox',
+  forcedFolder?: string,
 ): Promise<Response> {
   const chunk = new Uint8Array(await req.arrayBuffer())
   const current = await store.get(id)
@@ -161,7 +141,11 @@ async function upload(
   const meta: FileMeta = {
     id,
     name,
-    folder: req.headers.get('x-loft-folder') ?? current?.folder ?? folder,
+    folder:
+      forcedFolder ??
+      req.headers.get('x-loft-folder') ??
+      current?.folder ??
+      'Inbox',
     kind,
     bytes: body.byteLength,
     kept: current?.kept ?? false,

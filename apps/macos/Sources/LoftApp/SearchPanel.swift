@@ -137,7 +137,7 @@ final class SearchPanel: NSObject, NSTableViewDataSource, NSTableViewDelegate, N
     case Chrome.getInfo: InfoPanel.show(file, onDisk: Placeholder.allocated(url))
     case Chrome.copyLink: FileActions.copyLink(file, client: client)
     case Chrome.requestFiles:
-      if let request = FileActions.requestURL() { NSWorkspace.shared.open(request) }
+      FileActions.requestFiles(folder: file.folder, client: client)
     case Chrome.keepOnMac:
       transfer.show(file: file)
       let client = self.client

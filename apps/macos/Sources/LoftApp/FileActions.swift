@@ -4,22 +4,37 @@ import LoftKit
 enum FileActions {
   static func copyLink(_ file: DriveFile, client: CloudClient) {
     Task {
-      let text = (try? await client.share(id: file.id)) ?? Catalog.shareURL(
-        origin: ProcessInfo.processInfo.environment["LOFT_WEB"] ?? "http://127.0.0.1:3000",
-        id: file.id)
-      await MainActor.run {
-        let paste = NSPasteboard.general
-        paste.clearContents()
-        paste.setString(text, forType: .string)
+      do {
+        let text = try await client.share(id: file.id)
+        await MainActor.run {
+          let paste = NSPasteboard.general
+          paste.clearContents()
+          paste.setString(text, forType: .string)
+        }
+      } catch {
+        await showError(error)
       }
     }
   }
 
-  static func requestURL() -> URL? {
-    let origin = ProcessInfo.processInfo.environment["LOFT_WEB"]
-      ?? "http://127.0.0.1:3000"
-    let token = UUID().uuidString.split(separator: "-").first.map(String.init) ?? "demo"
-    return URL(string: "\(origin)/r/\(token)")
+  static func requestFiles(folder: String, client: CloudClient) {
+    Task {
+      do {
+        let text = try await client.requestFiles(folder: folder)
+        guard let url = URL(string: text) else { throw URLError(.badURL) }
+        await MainActor.run { _ = NSWorkspace.shared.open(url) }
+      } catch {
+        await showError(error)
+      }
+    }
+  }
+
+  @MainActor
+  private static func showError(_ error: Error) {
+    let alert = NSAlert()
+    alert.messageText = "Couldn't create a link"
+    alert.informativeText = error.localizedDescription
+    alert.runModal()
   }
 
   static func open(_ url: URL) {

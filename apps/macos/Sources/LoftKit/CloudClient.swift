@@ -112,7 +112,23 @@ public struct CloudClient: Sendable {
       url: origin.appendingPathComponent("v1").appendingPathComponent("files")
         .appendingPathComponent(id).appendingPathComponent("share"))
     req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-    let (data, _) = try await URLSession.shared.data(for: req)
+    let (data, response) = try await URLSession.shared.data(for: req)
+    guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+      throw URLError(.badServerResponse)
+    }
+    return try JSONDecoder().decode(ShareBody.self, from: data).url
+  }
+
+  public func requestFiles(folder: String) async throws -> String {
+    var req = URLRequest(url: origin.appendingPathComponent("v1/requests"))
+    req.httpMethod = "POST"
+    req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+    req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    req.httpBody = try JSONEncoder().encode(["folder": folder])
+    let (data, response) = try await URLSession.shared.data(for: req)
+    guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+      throw URLError(.badServerResponse)
+    }
     return try JSONDecoder().decode(ShareBody.self, from: data).url
   }
 
