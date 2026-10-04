@@ -30,15 +30,15 @@ enum FileActions {
   }
 
   @MainActor
-  private static func showError(_ error: Error) {
+  static func showError(_ error: Error) {
     let alert = NSAlert()
-    alert.messageText = "Couldn't create a link"
+    alert.messageText = "Loft couldn't complete this action"
     alert.informativeText = error.localizedDescription
     alert.runModal()
   }
 
   static func open(_ url: URL) {
-    NSWorkspace.shared.activateFileViewerSelecting([url])
+    NSWorkspace.shared.open(url)
   }
 }
 

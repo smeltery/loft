@@ -36,9 +36,12 @@ public struct DriveStore: Sendable {
   }
 
   public func sync(_ files: [RemoteFile]) throws {
-    try materialize()
+    try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
     for file in files {
-      try Placeholder.create(at: url(file.asDriveFile), bytes: file.bytes)
+      let destination = url(file.asDriveFile)
+      if !FileManager.default.fileExists(atPath: destination.path) {
+        try Placeholder.create(at: destination, bytes: file.bytes)
+      }
     }
   }
 }

@@ -93,7 +93,12 @@ async function route(req: Request, store: Store): Promise<Response> {
   if (!id || !safeId(id)) return json({ error: { code: 'NOT_FOUND' } }, 404)
   const isContent = Boolean(file?.[2])
   if (req.method === 'GET' && isContent) {
-    return content(store, id, req.headers.get('range') ?? undefined)
+    return content(
+      store,
+      id,
+      req.headers.get('range') ?? undefined,
+      req.headers.get('if-match'),
+    )
   }
   if (req.method === 'GET') {
     const meta = await store.get(id)
@@ -159,11 +164,19 @@ async function content(
   store: Store,
   id: string,
   rangeHeaderIn: string | undefined,
+  ifMatch?: string | null,
 ): Promise<Response> {
   const meta = await store.get(id)
   if (!meta || meta.deletedAt)
     return json({ error: { code: 'NOT_FOUND' } }, 404)
+  if (ifMatch && ifMatch !== '*' && ifMatch !== meta.etag)
+    return json({ error: { code: 'PRECONDITION_FAILED' } }, 412)
   const range: ByteRange | null = parseRange(rangeHeaderIn, meta.bytes)
+  if (rangeHeaderIn && !range)
+    return new Response(null, {
+      status: 416,
+      headers: { 'content-range': `bytes */${meta.bytes}` },
+    })
   const blob = await store.read(id, range?.start, range?.end)
   if (!blob) return json({ error: { code: 'NOT_FOUND' } }, 404)
   await pace(blob.bytes.byteLength)

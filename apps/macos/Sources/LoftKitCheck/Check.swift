@@ -3,7 +3,8 @@ import LoftKit
 
 @main
 enum LoftKitCheck {
-  static func main() {
+  static func main() async throws {
+    try await CloudChecks.run()
     let titles = [
       "Search Loft",
       "Open in Finder",
@@ -36,6 +37,12 @@ enum LoftKitCheck {
     guard aligned.offset == 8, aligned.length == 8 else {
       fatalError("aligned range mismatch \(aligned)")
     }
+    let crossing = CloudClient.alignedRange(offset: 7, requested: 4, alignment: 8, size: 100)
+    guard crossing.offset == 0, crossing.length == 16 else { fatalError("range omitted requested bytes") }
+    let full = CloudClient.alignedRange(offset: 0, requested: Int64.max, alignment: 4096, size: 5_000_001)
+    guard full.length == 5_000_001 else { fatalError("full range truncated") }
+    let extreme = CloudClient.alignedRange(offset: Int64.max - 3, requested: 10, alignment: 8, size: Int64.max)
+    guard extreme.offset + extreme.length == Int64.max else { fatalError("range overflow") }
     let share = Catalog.shareURL(origin: "https://loft.example", id: "wedding")
     guard share == "https://loft.example/s/wedding" else {
       fatalError("share url mismatch: \(share)")

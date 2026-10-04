@@ -9,8 +9,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   private var transfer: TransferPanel?
 
   func applicationDidFinishLaunching(_ notification: Notification) {
-    let store = DriveStore(root: LoftVolume.ensure())
-    try? store.materialize()
+    let preview = CommandLine.arguments.contains("--preview")
+    let store = DriveStore(root: preview ? LoftVolume.ensure() : DriveStore.supportRoot())
+    if preview {
+      do { try store.materialize() } catch { NSLog("loft preview: \(error.localizedDescription)") }
+    }
     let cloud = CloudClient.fromEnv()
     let transfer = TransferPanel()
     self.transfer = transfer

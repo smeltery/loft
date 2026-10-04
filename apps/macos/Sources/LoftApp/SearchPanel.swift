@@ -1,4 +1,5 @@
 import AppKit
+@preconcurrency import FileProvider
 import LoftKit
 
 @MainActor
@@ -10,8 +11,8 @@ final class SearchPanel: NSObject, NSTableViewDataSource, NSTableViewDelegate, N
   private var window: NSPanel?
   private var field: NSSearchField?
   private var table: NSTableView?
-  private var all: [DriveFile] = Catalog.files
-  private var hits: [DriveFile] = Catalog.files
+  private var all: [DriveFile] = []
+  private var hits: [DriveFile] = []
 
   init(store: DriveStore, transfer: TransferPanel, client: CloudClient) {
     self.store = store
@@ -29,14 +30,17 @@ final class SearchPanel: NSObject, NSTableViewDataSource, NSTableViewDelegate, N
     NSApp.activate(ignoringOtherApps: true)
     window?.makeFirstResponder(field)
     let client = self.client
-    let store = self.store
+    window?.title = "Loading Loft…"
     Task {
-      guard let files = try? await client.list() else { return }
-      try? store.sync(files)
-      let mapped = files.map(\.asDriveFile)
-      await MainActor.run {
-        self.all = mapped
+      do {
+        let files = try await client.list()
+        self.all = files.map(\.asDriveFile)
         self.applyFilter()
+        self.field?.placeholderString = self.all.isEmpty ? "No files in Loft" : Chrome.searchPlaceholder
+      } catch {
+        self.all = []
+        self.applyFilter()
+        self.field?.placeholderString = error.localizedDescription
       }
     }
   }
@@ -111,44 +115,42 @@ final class SearchPanel: NSObject, NSTableViewDataSource, NSTableViewDelegate, N
     -> NSView?
   {
     let file = hits.indices.contains(row) ? hits[row] : nil
-    let disk = file.map { Placeholder.allocated(store.url($0)) } ?? 0
     let size = file.map { Catalog.formatSize($0.bytes) } ?? ""
-    let diskNote = disk == 0 ? Chrome.zeroOnDisk : Catalog.formatSize(disk)
-    let text = NSTextField(labelWithString: "\(file?.name ?? "")    \(size)    \(diskNote)")
+    let text = NSTextField(labelWithString: "\(file?.name ?? "")    \(size)")
     text.font = .systemFont(ofSize: 13)
     return text
   }
 
   private func currentFile() -> DriveFile? {
-    let row = table?.clickedRow ?? table?.selectedRow ?? -1
+    let clicked = table?.clickedRow ?? -1
+    let row = clicked >= 0 ? clicked : (table?.selectedRow ?? -1)
     return hits.indices.contains(row) ? hits[row] : nil
   }
 
   @objc private func openRow() {
     guard let file = currentFile() else { return }
-    FileActions.open(store.url(file))
+    Task {
+      do { FileActions.open(try await LoftDomain.userURL(for: NSFileProviderItemIdentifier(file.id))) }
+      catch { FileActions.showError(error) }
+    }
   }
 
   @objc private func fromMenu(_ sender: NSMenuItem) {
     guard let file = currentFile() else { return }
-    let url = store.url(file)
     switch sender.title {
-    case Chrome.open: FileActions.open(url)
-    case Chrome.getInfo: InfoPanel.show(file, onDisk: Placeholder.allocated(url))
+    case Chrome.open: openRow()
+    case Chrome.getInfo:
+      Task {
+        do {
+          let url = try await LoftDomain.userURL(for: NSFileProviderItemIdentifier(file.id))
+          InfoPanel.show(file, onDisk: Placeholder.allocated(url))
+        } catch { FileActions.showError(error) }
+      }
     case Chrome.copyLink: FileActions.copyLink(file, client: client)
     case Chrome.requestFiles:
       FileActions.requestFiles(folder: file.folder, client: client)
     case Chrome.keepOnMac:
-      transfer.show(file: file)
-      let client = self.client
-      Task {
-        try? await client.keep(id: file.id)
-        try? await client.download(id: file.id, to: url)
-        await MainActor.run {
-          self.transfer.hide()
-          self.table?.reloadData()
-        }
-      }
+      transfer.keep(file: file) { [weak self] _ in self?.table?.reloadData() }
     default: break
     }
   }

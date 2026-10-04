@@ -1,5 +1,6 @@
 @preconcurrency import FileProvider
 import Foundation
+import CryptoKit
 import LoftKit
 
 @objc(LoftExtension)
@@ -7,8 +8,10 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
   NSFileProviderPartialContentFetching, @unchecked Sendable
 {
   private let client: CloudClient
+  private let domain: NSFileProviderDomain
 
   @objc public required init(domain: NSFileProviderDomain) {
+    self.domain = domain
     client = CloudClient.fromEnv()
     super.init()
   }
@@ -33,14 +36,9 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
         finish(LoftItem(folder: String(id.rawValue.dropFirst("folder:".count))), nil)
         return
       }
-      let files = try? await client.list()
-      if let hit = files?.first(where: { $0.id == id.rawValue }) {
-        finish(LoftItem(hit), nil)
-      } else {
-        finish(
-          nil,
-          NSError(domain: NSFileProviderErrorDomain, code: NSFileProviderError.noSuchItem.rawValue))
-      }
+      do {
+        finish(LoftItem(try await client.file(id: id.rawValue)), nil)
+      } catch { finish(nil, error) }
     }
     return progress
   }
@@ -50,12 +48,24 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
     request: NSFileProviderRequest,
     completionHandler: @escaping @Sendable (URL?, NSFileProviderItem?, Error?) -> Void
   ) -> Progress {
-    fetchPartialContents(
-      for: itemIdentifier, version: version ?? NSFileProviderItemVersion(), request: request,
-      minimalRange: NSRange(location: 0, length: Int.max), aligningTo: 1, options: [],
-      completionHandler: { url, item, _, _, error in
-        completionHandler(url, item, error)
-      })
+    let progress = Progress(totalUnitCount: 1)
+    let client = self.client
+    let requestedVersion = version?.contentVersion
+    let task = Task {
+      do {
+        let file = try await client.file(id: itemIdentifier.rawValue)
+        if let requestedVersion, requestedVersion != Data(file.version.utf8) { throw CloudError(status: 412) }
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try await client.download(id: file.id, to: url, expectedVersion: file.version) { received, total in
+          progress.totalUnitCount = max(total, 1)
+          progress.completedUnitCount = received
+        }
+        progress.completedUnitCount = progress.totalUnitCount
+        completionHandler(url, LoftItem(file), nil)
+      } catch { completionHandler(nil, nil, error) }
+    }
+    progress.cancellationHandler = { task.cancel() }
+    return progress
   }
 
   public func fetchPartialContents(
@@ -69,32 +79,44 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
     let progress = Progress(totalUnitCount: 1)
     let client = self.client
     let itemId = itemIdentifier.rawValue
+    let requestedVersion = version.contentVersion
     let finish = completionHandler
-    Task {
+    let task = Task {
       do {
-        let files = try await client.list()
-        guard let file = files.first(where: { $0.id == itemId }) else {
-          throw NSError(
-            domain: NSFileProviderErrorDomain, code: NSFileProviderError.noSuchItem.rawValue)
-        }
+        let file = try await client.file(id: itemId)
+        guard requestedVersion == Data(file.version.utf8) else { throw CloudError(status: 412) }
         let aligned = CloudClient.alignedRange(
           offset: Int64(range.location),
           requested: range.length == Int.max ? Int64.max : Int64(range.length),
           alignment: alignment, size: file.bytes)
-        let data = try await client.fetch(id: file.id, offset: aligned.offset, length: aligned.length)
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(file.id)
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        var completed = false
+        defer { if !completed { try? FileManager.default.removeItem(at: url) } }
         try Placeholder.create(at: url, bytes: file.bytes)
         let handle = try FileHandle(forWritingTo: url)
+        defer { try? handle.close() }
         try handle.seek(toOffset: UInt64(aligned.offset))
-        try handle.write(contentsOf: data)
+        var received: Int64 = 0
+        progress.totalUnitCount = max(aligned.length, 1)
+        while received < aligned.length {
+          try Task.checkCancellation()
+          let data = try await client.fetch(id: file.id, offset: aligned.offset + received,
+            length: min(1_048_576, aligned.length - received), ifMatch: file.etag)
+          try handle.write(contentsOf: data)
+          received += Int64(data.count)
+          progress.completedUnitCount = received
+        }
         try handle.close()
-        let got = NSRange(location: Int(aligned.offset), length: data.count)
-        progress.completedUnitCount = 1
+        try Task.checkCancellation()
+        let got = NSRange(location: Int(aligned.offset), length: Int(aligned.length))
+        progress.completedUnitCount = progress.totalUnitCount
+        completed = true
         finish(url, LoftItem(file), got, [], nil)
       } catch {
         finish(nil, nil, range, [], error)
       }
     }
+    progress.cancellationHandler = { task.cancel() }
     return progress
   }
 
@@ -107,21 +129,19 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
     let progress = Progress(totalUnitCount: 1)
     let client = self.client
     let name = itemTemplate.filename
-    let body = url.flatMap { try? Data(contentsOf: $0) }
     let folder = itemTemplate.parentItemIdentifier.rawValue.hasPrefix("folder:")
-      ? String(itemTemplate.parentItemIdentifier.rawValue.dropFirst("folder:".count))
-      : "Inbox"
-    let finish = completionHandler
-    nonisolated(unsafe) let template = itemTemplate
-    Task {
-      defer { progress.completedUnitCount = 1 }
-      guard let body else {
-        finish(template, [], false, nil)
-        return
-      }
-      try? await client.put(id: name, name: name, folder: folder, body: body)
-      finish(template, [], false, nil)
+      ? String(itemTemplate.parentItemIdentifier.rawValue.dropFirst("folder:".count)) : "Inbox"
+    let id = SHA256.hash(data: Data(itemTemplate.itemIdentifier.rawValue.utf8)).map { String(format: "%02x", $0) }.joined()
+    let task = Task {
+      do {
+        guard let url else { throw CocoaError(.featureUnsupported) }
+        try await client.upload(id: id, name: name, folder: folder, from: url)
+        let file = try await client.file(id: id)
+        progress.completedUnitCount = 1
+        completionHandler(LoftItem(file), [], false, nil)
+      } catch { completionHandler(nil, fields, false, error) }
     }
+    progress.cancellationHandler = { task.cancel() }
     return progress
   }
 
@@ -134,20 +154,21 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
   ) -> Progress {
     let progress = Progress(totalUnitCount: 1)
     let client = self.client
-    let body = newContents.flatMap { try? Data(contentsOf: $0) }
     let id = item.itemIdentifier.rawValue
+    let name = item.filename
     let folder = item.parentItemIdentifier.rawValue.hasPrefix("folder:")
       ? String(item.parentItemIdentifier.rawValue.dropFirst("folder:".count)) : "Inbox"
-    let finish = completionHandler
-    nonisolated(unsafe) let current = item
-    Task {
-      defer { progress.completedUnitCount = 1 }
-      if let body {
-        let match = String(data: baseVersion.contentVersion, encoding: .utf8)
-        try? await client.put(id: id, name: item.filename, folder: folder, body: body, ifMatch: match)
-      }
-      finish(current, [], false, nil)
+    let match = String(data: baseVersion.contentVersion, encoding: .utf8)
+    let task = Task {
+      do {
+        guard let newContents else { throw CocoaError(.featureUnsupported) }
+        try await client.upload(id: id, name: name, folder: folder, from: newContents, ifMatch: match)
+        let file = try await client.file(id: id)
+        progress.completedUnitCount = 1
+        completionHandler(LoftItem(file), [], false, nil)
+      } catch { completionHandler(nil, changedFields, false, error) }
     }
+    progress.cancellationHandler = { task.cancel() }
     return progress
   }
 
@@ -160,11 +181,15 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
     let client = self.client
     let id = identifier.rawValue
     let finish = completionHandler
-    Task {
-      if !id.hasPrefix("folder:") { try? await client.remove(id: id) }
-      progress.completedUnitCount = 1
-      finish(nil)
+    let task = Task {
+      do {
+        guard !id.hasPrefix("folder:") else { throw CocoaError(.featureUnsupported) }
+        try await client.remove(id: id)
+        progress.completedUnitCount = 1
+        finish(nil)
+      } catch { finish(error) }
     }
+    progress.cancellationHandler = { task.cancel() }
     return progress
   }
 
@@ -181,16 +206,28 @@ public final class LoftExtension: NSObject, NSFileProviderReplicatedExtension,
   ) -> Progress {
     let progress = Progress(totalUnitCount: 1)
     let client = self.client
-    let finish = completionHandler
-    Task {
-      if identifier.rawValue == "dev.smeltery.loft.keep" {
-        for id in ids where !id.rawValue.hasPrefix("folder:") {
-          try? await client.keep(id: id.rawValue)
+    let domain = self.domain
+    let task = Task {
+      do {
+        guard identifier.rawValue == "dev.smeltery.loft.keep",
+          let manager = NSFileProviderManager(for: domain) else { throw CocoaError(.featureUnsupported) }
+        let files = try await client.list()
+        for id in ids {
+          LocalPins.set(id.rawValue, pinned: true)
+          let children = id.rawValue.hasPrefix("folder:")
+            ? files.filter { $0.folder == String(id.rawValue.dropFirst(7)) }.map { NSFileProviderItemIdentifier($0.id) }
+            : [id]
+          for child in children {
+            LocalPins.set(child.rawValue, pinned: true)
+            try await manager.requestDownloadForItem(withIdentifier: child)
+          }
         }
-      }
-      progress.completedUnitCount = 1
-      finish(nil)
+        try await manager.signalEnumerator(for: .rootContainer)
+        progress.completedUnitCount = 1
+        completionHandler(nil)
+      } catch { completionHandler(error) }
     }
+    progress.cancellationHandler = { task.cancel() }
     return progress
   }
 }

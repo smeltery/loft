@@ -29,16 +29,11 @@ public enum Placeholder {
   public static func save(_ data: Data, to url: URL) throws {
     try FileManager.default.createDirectory(
       at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-    try data.write(to: url)
+    try data.write(to: url, options: .atomic)
     try xattr(url, set: "1")
   }
 
   public static func keep(_ url: URL) throws {
-    let fd = open(url.path, O_RDWR)
-    guard fd >= 0 else { throw DriveError.io }
-    defer { close(fd) }
-    let head = [UInt8](repeating: 0, count: 4096)
-    _ = head.withUnsafeBytes { write(fd, $0.baseAddress, 4096) }
     try xattr(url, set: "1")
   }
 
