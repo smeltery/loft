@@ -30,7 +30,7 @@
   font-weight: 600;
   display: inline-flex;
 }
-.logo {
+.app-body .logo {
   width: 24px;
   height: 18px;
   display: block;
@@ -203,7 +203,7 @@
   max-width: none;
   color: var(--ink);
 }
-.pill {
+.app-body .pill {
   height: 34px;
   padding: 0 var(--s-3);
   border-radius: var(--radius-sm);
@@ -212,7 +212,7 @@
   display: inline-flex;
   align-items: center;
 }
-.pill-dark {
+.app-body .pill-dark {
   background: var(--ink);
   color: var(--on-ink);
 }

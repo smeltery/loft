@@ -1,0 +1,28 @@
+.story {
+  height: 320vh;
+  overflow-x: clip;
+}
+.story-sticky {
+  position: sticky;
+  top: 56px;
+}
+.story + .notes {
+  padding-top: var(--s-4);
+}
+.story .frame {
+  padding: clamp(28px, 5vw, 64px) clamp(20px, 4vw, 48px);
+}
+@media (min-width: 800px) {
+  .story .frame {
+    padding: clamp(36px, 5vw, 64px) clamp(28px, 4vw, 48px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story {
+    height: auto;
+    padding-top: var(--s-5);
+  }
+  .story-sticky {
+    position: static;
+  }
+}

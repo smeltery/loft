@@ -22,14 +22,14 @@ export const catalog: DriveFile[] = [
     id: 'notes',
     name: 'Edit Notes.md',
     kind: 'Markdown',
-    bytes: 12_288,
+    bytes: 12_000,
     folder: 'Client Work',
   },
   {
     id: 'deck',
     name: 'Pitch Deck.pdf',
     kind: 'PDF',
-    bytes: 50_331_648,
+    bytes: 48_000_000,
     folder: 'Client Work',
   },
   {
@@ -71,7 +71,7 @@ export const catalog: DriveFile[] = [
     id: 'budget',
     name: 'Budget.xlsx',
     kind: 'Spreadsheet',
-    bytes: 1_363_968,
+    bytes: 1_300_000,
     folder: 'Client Work',
   },
   {
@@ -85,7 +85,7 @@ export const catalog: DriveFile[] = [
     id: 'invoice',
     name: 'Invoice.pdf',
     kind: 'PDF',
-    bytes: 3_355_443,
+    bytes: 3_200_000,
     folder: 'Client Work',
   },
 ]
@@ -99,8 +99,9 @@ export function formatSize(bytes: number): string {
     i += 1
   }
   if (i === 0) return `${bytes} bytes`
-  const digits = n >= 10 ? 1 : 1
-  return `${n.toFixed(digits)} ${units[i]}`
+  const rounded = Math.round(n * 10) / 10
+  const text = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)
+  return `${text} ${units[i]}`
 }
 
 export function diskBytes(keepOnMac: boolean, logical: number): number {

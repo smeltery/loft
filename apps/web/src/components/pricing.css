@@ -1,0 +1,65 @@
+.price-card {
+  max-width: 440px;
+  margin: var(--s-6) auto 0;
+  padding: var(--s-5);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: left;
+}
+.price-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--t-sm);
+  font-weight: 500;
+}
+.price-badge {
+  padding: var(--s-1) var(--s-2);
+  background: var(--bg);
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-size: var(--t-xs);
+}
+.price-value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  margin-top: var(--s-5);
+}
+.price-value strong {
+  color: var(--ink);
+  font-size: var(--t-3xl);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+.price-value span {
+  font-size: var(--t-sm);
+}
+.price-caption {
+  font-size: var(--t-sm);
+  margin-top: var(--s-2);
+}
+.price-features {
+  display: grid;
+  gap: var(--s-3);
+  padding-top: var(--s-5);
+  margin-top: var(--s-5);
+  border-top: 0.5px solid #0000001a;
+  font-size: var(--t-sm);
+}
+.price-features li::before {
+  content: "✓";
+  margin-right: var(--s-3);
+}
+.price-go {
+  width: 100%;
+  margin-top: var(--s-5);
+}
+.price-note {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+  text-align: center;
+  margin-top: var(--s-3);
+  text-wrap: pretty;
+}

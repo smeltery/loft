@@ -2,9 +2,9 @@ import { describe, expect, test } from 'bun:test'
 import { clampTb, monthlyUsd } from './price'
 
 describe('price', () => {
-  test('charges nine dollars per terabyte', () => {
-    expect(monthlyUsd(1)).toBe(9)
-    expect(monthlyUsd(4)).toBe(36)
+  test('is free at every size', () => {
+    expect(monthlyUsd(1)).toBe(0)
+    expect(monthlyUsd(4)).toBe(0)
   })
 
   test('clamps to the published plan range', () => {
