@@ -55,18 +55,26 @@ scripts/package-macos.sh
 ## Brand icons
 
 The canonical artwork is `apps/web/public/brand/logo.svg`. Regenerate native
-black/white PNGs, multi-resolution ICNS files and the Finder sidebar symbol
+black/white PNGs, multi-resolution ICNS files, the layered app icon foreground,
+and the Finder sidebar symbol
 with `swift scripts/generate-macos-icons.swift "$PWD"` from the repository root.
 The white vector is also available at `apps/macos/Resources/logo-white.svg`.
 
 Menu-bar and Settings images are templates, so macOS supplies the appropriate
-contrast, including selection states. The running app switches its Dock icon
-between black and white when its effective appearance changes. Loft remains
-a menu-bar app; this does not add a permanent Dock entry.
+contrast, including selection states. The app icon uses `Resources/Loft.icon`: a
+separate logo layer with black artwork in the default appearance and white
+artwork in dark and monochrome appearances. macOS renders the layered icon
+for Dock, Finder, and menu-bar managers that use the app icon as a fallback.
+This keeps the logo visible with Clear icons. Loft remains a menu-bar app;
+this does not add a permanent Dock entry.
 
 Both bundles declare a Loft icon for Finder and system dialogs. The provider
 uses the custom `LoftSidebar` SF Symbol for its Finder Locations entry, allowing
-Finder to tint it for light and dark appearances. Packaging with full Xcode
-compiles that symbol; Command Line Tools-only builds emit a warning and use
-the bundle icon fallback. CI checks the fully compiled symbol. An enabled,
+Finder to tint it for light and dark appearances. Packaging requires full
+Xcode 26 or newer to compile the layered app icon and sidebar symbol. CI and
+release builds select Xcode 26.6 explicitly. Command Line Tools-only builds
+emit a warning and use legacy ICNS icons, which may lose their foreground in
+Clear mode; those builds switch the running Dock image between black and white.
+CI checks both compiled asset catalogs and uploads the packaged app for
+runtime verification. An enabled,
 correctly signed provider installation is still needed to verify Finder UI.
