@@ -7,8 +7,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   private var search: SearchPanel?
   private var settings: NSWindow?
   private var transfer: TransferPanel?
+  private var appearanceObservation: NSKeyValueObservation?
 
   func applicationDidFinishLaunching(_ notification: Notification) {
+    appearanceObservation = NSApp.observe(\.effectiveAppearance, options: [.initial, .new]) { _, _ in
+      Task { @MainActor in BrandImage.updateApplicationIcon() }
+    }
     let preview = CommandLine.arguments.contains("--preview")
     let store = DriveStore(root: preview ? LoftVolume.ensure() : DriveStore.supportRoot())
     if preview {

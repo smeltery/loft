@@ -2,7 +2,7 @@ import AppKit
 import Foundation
 
 enum BrandImage {
-  static func mark(pointSize: NSSize = NSSize(width: 18, height: 13)) -> NSImage {
+  static func mark(pointSize: NSSize = NSSize(width: 18, height: 13.5)) -> NSImage {
     let names = ["logo@2x", "logo", "appicon"]
     for name in names {
       if let url = url(name), let image = NSImage(contentsOf: url) {
@@ -11,16 +11,29 @@ enum BrandImage {
         return image
       }
     }
-    return NSImage(systemSymbolName: "cloud.fill", accessibilityDescription: "loft")
-      ?? NSImage()
+    NSLog("Loft logo resources are missing from the app bundle")
+    return NSImage()
   }
 
   static func appIcon() -> NSImage {
     if let url = url("appicon"), let image = NSImage(contentsOf: url) {
-      image.size = NSSize(width: 64, height: 48)
+      image.size = NSSize(width: 64, height: 64)
+      image.isTemplate = true
       return image
     }
     return mark(pointSize: NSSize(width: 64, height: 48))
+  }
+
+  @MainActor
+  static func updateApplicationIcon() {
+    let dark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+    let name = dark ? "appicon-dark" : "appicon"
+    guard let url = url(name), let image = NSImage(contentsOf: url) else {
+      NSLog("Loft application icon is missing: %@", name)
+      return
+    }
+    // Dock icons are not template images, so switch the original artwork explicitly.
+    NSApp.applicationIconImage = image
   }
 
   private static func url(_ name: String) -> URL? {
