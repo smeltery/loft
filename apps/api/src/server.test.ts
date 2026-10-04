@@ -5,7 +5,6 @@ import { join } from 'node:path'
 import { diskStore } from './disk'
 import { parseContentRange, parseRange, rangeHeader, safeId } from './meta'
 import { handle } from './server'
-import { shareLink } from './sign'
 
 const auth = { authorization: 'Bearer dev' }
 
@@ -66,21 +65,16 @@ describe('storage api', () => {
       ).status,
     ).toBe(200)
     expect((await handle(new Request('http://x/s/clip'), store)).status).toBe(
-      401,
+      404,
     )
-    const signed = shareLink('http://127.0.0.1:8787', 'clip', 'dev')
-    const share = await handle(
-      new Request(`http://x/s/clip?exp=${signed.exp}&sig=${signed.sig}`),
-      store,
-    )
-    expect(share.status).toBe(200)
     const link = await handle(
       new Request('http://x/v1/files/clip/share', { headers: auth }),
       store,
     )
-    expect(((await link.json()) as { url: string }).url).toContain(
-      '/s/clip?exp=',
-    )
+    const signed = (await link.json()) as { url: string }
+    const share = await handle(new Request(signed.url), store)
+    expect(share.status).toBe(200)
+    expect(await share.text()).toBe('abcdefghij')
     const gone = await handle(
       new Request('http://x/v1/files/clip', {
         method: 'DELETE',
@@ -108,8 +102,17 @@ describe('storage api', () => {
       store,
     )
     expect(back.status).toBe(200)
+    const issued = await handle(
+      new Request('http://x/v1/requests', {
+        method: 'POST',
+        headers: { ...auth, 'content-type': 'application/json' },
+        body: JSON.stringify({ folder: 'Requests' }),
+      }),
+      store,
+    )
+    const requestLink = (await issued.json()) as { url: string }
     const drop = await handle(
-      new Request('http://x/r/guest', {
+      new Request(requestLink.url, {
         method: 'PUT',
         headers: { 'x-loft-name': 'notes.txt', 'content-type': 'text/plain' },
         body: 'hi',
@@ -121,9 +124,7 @@ describe('storage api', () => {
       await handle(new Request('http://x/v1/files', { headers: auth }), store)
     ).json()) as { files: { folder: string; id: string }[] }
     expect(
-      inbox.files.some(
-        (f) => f.folder === 'Requests' && f.id.startsWith('r-guest-'),
-      ),
+      inbox.files.some((f) => f.folder === 'Requests' && f.id.startsWith('r-')),
     ).toBe(true)
   })
 

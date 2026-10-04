@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { AccountPage } from './account/overview'
 import { DeletedPage } from './account/deleted'
 import { SettingsPage } from './account/settings'
 import { savedToken } from './account/api'
 import { Logo } from './logo'
 import { site } from './copy'
-import { apiOrigin } from './share-id'
+import { SharingPage } from './account/sharing'
 import './app.css'
 
 const tabs: { href: string; label: string; sep?: boolean }[] = [
@@ -15,16 +15,6 @@ const tabs: { href: string; label: string; sep?: boolean }[] = [
   { href: '/app/settings', label: 'settings' },
   { href: '/app/deleted', label: 'deleted', sep: true },
 ]
-
-type Remote = { id: string; name: string; folder: string }
-
-function headers() {
-  const token =
-    typeof window === 'undefined'
-      ? 'dev'
-      : (localStorage.getItem('loft-token') ?? 'dev')
-  return { authorization: `Bearer ${token}` }
-}
 
 export function AppShell({ path }: { path: string }) {
   const [token, setToken] = useState(savedToken)
@@ -37,13 +27,20 @@ export function AppShell({ path }: { path: string }) {
         </a>
       </header>
       <main className="a-main">
-        <h1 className="account-heading">
-          {path.startsWith('/app/deleted')
-            ? 'recently deleted'
-            : path.startsWith('/app/sharing')
-              ? 'sharing'
-              : (tabs.find((tab) => tab.href === path)?.label ?? 'account')}
-        </h1>
+        <header className="account-page-head">
+          <h1 className="account-heading">
+            {path.startsWith('/app/deleted')
+              ? 'recently deleted'
+              : path.startsWith('/app/sharing')
+                ? 'sharing'
+                : (tabs.find((tab) => tab.href === path)?.label ?? 'account')}
+          </h1>
+          {path.startsWith('/app/sharing') && (
+            <p className="faint">
+              links to your files, and requests for uploads to your folders.
+            </p>
+          )}
+        </header>
         {page(path, token, setToken)}
       </main>
       <nav className="dock" aria-label="main">
@@ -91,7 +88,8 @@ function DockIcon({ name }: { name: string }) {
 
 function page(path: string, token: string, setToken: (token: string) => void) {
   if (path.startsWith('/app/plan')) return <PlanPage />
-  if (path.startsWith('/app/sharing')) return <FileList trash={false} />
+  if (path.startsWith('/app/sharing'))
+    return <SharingPage key={token} token={token} />
   if (path.startsWith('/app/settings'))
     return <SettingsPage token={token} onSave={setToken} />
   if (path.startsWith('/app/deleted'))
@@ -110,41 +108,6 @@ function PlanPage() {
         <span className="muted">you run the storage api</span>
       </p>
       <p className="faint">S3 optional · disk backend by default</p>
-    </article>
-  )
-}
-
-function FileList({ trash }: { trash: boolean }) {
-  const [files, setFiles] = useState<Remote[] | null>(null)
-  useEffect(() => {
-    const q = trash ? '?trash=1' : ''
-    fetch(`${apiOrigin()}/v1/files${q}`, { headers: headers() })
-      .then((res) =>
-        res.ok ? (res.json() as Promise<{ files: Remote[] }>) : null,
-      )
-      .then((body) => setFiles(body?.files ?? []))
-      .catch(() => setFiles([]))
-  }, [trash])
-  if (!files?.length) {
-    return (
-      <article className="card empty">
-        <h3>{trash ? 'nothing in deleted' : 'no shared links yet'}</h3>
-        <p>
-          {trash
-            ? 'files you delete stay for 30 days, then they’re gone.'
-            : 'right-click a file in Finder and copy a loft link.'}
-        </p>
-      </article>
-    )
-  }
-  return (
-    <article className="card">
-      {files.map((file) => (
-        <p className="kv" key={file.id}>
-          <span>{file.name}</span>
-          <span>{file.folder}</span>
-        </p>
-      ))}
     </article>
   )
 }

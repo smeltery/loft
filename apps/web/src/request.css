@@ -62,3 +62,23 @@
   height: 3px;
   background: #007aff;
 }
+.rq-drop input {
+  display: block;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.rq-drop:focus-within {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.rq-file {
+  gap: 16px;
+  overflow-wrap: anywhere;
+}
+.rq-preview {
+  max-width: min(720px, 100%);
+  max-height: 60vh;
+  border-radius: 16px;
+}

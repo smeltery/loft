@@ -2,10 +2,13 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { FileMeta } from './meta'
 import { staleTrash } from './sign'
+import { diskLinks } from './disk-links'
+import type { LinkStore } from './links'
 
 export type Blob = { bytes: Uint8Array; meta: FileMeta }
 
 export type Store = {
+  links: LinkStore
   list(trash?: boolean): Promise<FileMeta[]>
   get(id: string): Promise<FileMeta | null>
   put(meta: FileMeta, body: Uint8Array): Promise<FileMeta>
@@ -31,6 +34,7 @@ export function diskStore(root: string): Store {
   }
 
   return {
+    links: diskLinks(root),
     async list(trash = false) {
       await ready
       const names = await readdir(metaDir)

@@ -1,6 +1,7 @@
 import type { Store } from './disk'
 import type { FileMeta } from './meta'
 import { staleTrash } from './sign'
+import { linkStore, type LinkRecord } from './links'
 
 type S3Like = {
   file(key: string): {
@@ -10,16 +11,65 @@ type S3Like = {
     write(data: Uint8Array | string): Promise<unknown>
     delete(): Promise<unknown>
   }
-  list(opts: { prefix: string }): Promise<{ contents?: { key?: string }[] }>
+  list(opts: { prefix: string; continuationToken?: string }): Promise<{
+    contents?: { key?: string }[]
+    isTruncated?: boolean
+    nextContinuationToken?: string
+  }>
 }
 
 export function s3Store(client: S3Like): Store {
   const metaKey = (id: string) => `meta/${id}.json`
   const blobKey = (id: string) => `blob/${id}`
 
+  async function listAll(prefix: string) {
+    const contents: { key?: string }[] = []
+    let continuationToken: string | undefined
+    do {
+      const page = await client.list({ prefix, continuationToken })
+      contents.push(...(page.contents ?? []))
+      if (!page.isTruncated) break
+      if (
+        !page.nextContinuationToken ||
+        page.nextContinuationToken === continuationToken
+      ) {
+        throw new Error(
+          'S3 returned an incomplete listing without a continuation token',
+        )
+      }
+      continuationToken = page.nextContinuationToken
+    } while (continuationToken)
+    return { contents }
+  }
+
   return {
+    links: linkStore({
+      async list() {
+        const listed = await listAll('links/')
+        const records: LinkRecord[] = []
+        for (const object of listed.contents ?? []) {
+          if (object.key?.endsWith('.json'))
+            records.push((await client.file(object.key).json()) as LinkRecord)
+        }
+        return records
+      },
+      async get(id) {
+        try {
+          return (await client.file(`links/${id}.json`).json()) as LinkRecord
+        } catch (error) {
+          const code = (error as { code?: string }).code
+          if (code === 'NoSuchKey' || code === 'NotFound') return null
+          throw error
+        }
+      },
+      async put(record) {
+        await client
+          .file(`links/${record.id}.json`)
+          .write(JSON.stringify(record))
+      },
+    }),
     async list(trash = false) {
-      const listed = await client.list({ prefix: 'meta/' })
+      const listed = await listAll('meta/')
       const rows: FileMeta[] = []
       for (const obj of listed.contents ?? []) {
         if (!obj.key?.endsWith('.json')) continue

@@ -29,10 +29,16 @@ flowchart LR
 | GET | `/v1/files/:id/content` | bearer | body, honors `Range` |
 | PUT | `/v1/files/:id/content` | bearer | upload |
 | POST | `/v1/files/:id/keep` | bearer | keep on this Mac |
-| GET | `/v1/files/:id/share` | bearer | signed `/s/:id?exp&sig` |
+| GET | `/v1/files/:id/share` | bearer | issue tracked `/s/:link?exp&sig` |
 | DELETE | `/v1/files/:id` | bearer | trash (30 days) |
 | POST | `/v1/files/:id/restore` | bearer | restore |
-| GET | `/s/:id` | sig query | share bytes |
+| GET | `/v1/sharing` | bearer | active issued share links and file requests |
+| DELETE | `/v1/sharing/:link` | bearer | revoke a link or close a request |
+| POST | `/v1/requests` | bearer | issue an upload request with JSON `folder` |
+| GET | `/s/:link` | sig query | share bytes for an active issued link |
+| GET | `/s/:link/meta` | sig query | file metadata; records a page open |
+| GET | `/r/:token` | request token | request destination and expiry |
+| PUT | `/r/:token` | request token | upload into the saved destination |
 | POST | `/v1/trash/purge` | bearer | drop trash older than 30 days |
 
 ```bash
@@ -42,6 +48,26 @@ bun --filter @loft/api dev
 PUT content honors `If-Match` (etag) and `Content-Range` for resume. Optional
 `LOFT_BPS` caps download speed. Extra bearers go in `LOFT_TOKENS`. Pass
 `kms_key_arn` to Terraform for SSE-KMS instead of AES256.
+
+## Sharing and file requests
+
+Set `LOFT_WEB` to the public web origin for issued links. Share and request
+records live alongside file metadata under `links/` in the disk root or S3
+bucket. Links expire after seven days. Revoking a link stops subsequent
+access without deleting the underlying file. Closing a request stops new
+uploads without removing files already received. In-flight transfers may
+finish after revocation.
+
+The Shared page lists issued records, with separate share-link and file-request
+views. Opens count successful metadata requests, including repeat visits;
+uploads count successful uploads. Counts are not unique visitor analytics.
+Metadata updates are serialized within one API process; run one API writer
+per store. Multiple writers require a transactional store or conditional writes.
+
+Previously generated untracked `/s/:file` and arbitrary `/r/:token` URLs are
+no longer accepted. Recreate share links with Copy Link and file requests
+with Request Files or the web app. Public request uploads always use the
+saved destination; upload headers cannot redirect them to another folder.
 
 ## AWS
 

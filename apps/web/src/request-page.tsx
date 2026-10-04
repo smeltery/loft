@@ -1,52 +1,123 @@
 import { useState } from 'react'
-import { catalog, chromeCopy, formatSize } from '@loft/core'
+import { chromeCopy } from '@loft/core'
 import { Logo } from './logo'
 import { apiOrigin } from './share-id'
+import { useAccountResource } from './account/resource'
 import './request.css'
 
+type UploadResult = {
+  id: string
+  name: string
+  status: 'uploading' | 'uploaded' | 'failed'
+}
+
 export function RequestPage({ token }: { token: string }) {
-  const sample = catalog.find((file) => file.id === 'wedding')
-  const [note, setNote] = useState('')
+  const { data, error, loading } = useAccountResource<{ folder: string }>(
+    `/r/${encodeURIComponent(token)}`,
+    '',
+  )
+  const [files, setFiles] = useState<UploadResult[]>([])
+  const [busy, setBusy] = useState(false)
+  const [failure, setFailure] = useState('')
   async function send(list: FileList | null) {
-    if (!list?.length) return
-    for (const file of [...list]) {
-      await fetch(`${apiOrigin()}/r/${token}`, {
-        method: 'PUT',
-        headers: {
-          'x-loft-name': file.name,
-          'content-type': file.type || 'application/octet-stream',
-        },
-        body: file,
-      })
+    if (!list?.length || busy || !data) return
+    setBusy(true)
+    setFailure('')
+    const selected = [...list]
+    setFiles(
+      selected.map((file) => ({
+        id: crypto.randomUUID(),
+        name: file.name,
+        status: 'uploading',
+      })),
+    )
+    for (const [index, file] of selected.entries()) {
+      let status: UploadResult['status'] = 'uploaded'
+      try {
+        const response = await fetch(
+          `${apiOrigin()}/r/${encodeURIComponent(token)}`,
+          {
+            method: 'PUT',
+            headers: {
+              'x-loft-name': file.name,
+              'content-type': file.type || 'application/octet-stream',
+            },
+            body: file,
+          },
+        )
+        if (!response.ok)
+          throw new Error(
+            response.status === 404
+              ? 'This request is closed or expired.'
+              : 'Upload failed. Select the failed files to retry.',
+          )
+      } catch (error) {
+        status = 'failed'
+        setFailure(
+          error instanceof Error ? error.message : 'Upload failed. Try again.',
+        )
+      }
+      setFiles((current) =>
+        current.map((row, i) => (i === index ? { ...row, status } : row)),
+      )
     }
-    setNote('uploaded')
+    setBusy(false)
   }
   return (
     <main className="request">
       <p className="rq-domain">
-        <Logo /> loft.app
+        <Logo /> loft
       </p>
       <p className="rq-title">{chromeCopy.request.title}</p>
       <p className="rq-sub">{chromeCopy.request.sub}</p>
-      <label className="rq-drop">
-        <input
-          type="file"
-          multiple
-          onChange={(e) => void send(e.target.files)}
-        />
-        <b>{chromeCopy.request.choose}</b> {chromeCopy.request.orDrop}
-      </label>
-      {sample ? (
-        <p className="rq-file">
-          <span>{sample.name}</span>
-          <span>62%</span>
-          <i style={{ width: '62%' }} />
+      {loading ? (
+        <p role="status">loading request…</p>
+      ) : error ? (
+        <p role="alert">
+          This request is unavailable. It may have expired or been closed.
         </p>
-      ) : null}
-      <p className="rq-token">request {token}</p>
-      <p className="rq-size">
-        {note || (sample ? formatSize(sample.bytes) : '')}
-      </p>
+      ) : (
+        <>
+          <p className="rq-sub">destination: {data?.folder}</p>
+          <label
+            className="rq-drop"
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault()
+              void send(event.dataTransfer.files)
+            }}
+          >
+            <input
+              type="file"
+              multiple
+              disabled={busy}
+              aria-label="choose files"
+              onChange={(event) => {
+                void send(event.target.files)
+                event.target.value = ''
+              }}
+            />
+            <span>
+              <b>{busy ? 'uploading…' : chromeCopy.request.choose}</b>{' '}
+              {busy ? '' : chromeCopy.request.orDrop}
+            </span>
+          </label>
+        </>
+      )}
+      {files.map((file) => (
+        <p className="rq-file" key={file.id}>
+          <span>{file.name}</span>
+          <span>{file.status}</span>
+        </p>
+      ))}
+      {failure && (
+        <p className="rq-sub" role="alert">
+          {failure}
+        </p>
+      )}
+      {!busy && files.length > 0 && !failure && (
+        <p role="status">all files uploaded</p>
+      )}
     </main>
   )
 }
