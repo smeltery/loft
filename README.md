@@ -1,5 +1,7 @@
 # loft
 
+![loft — more space for your mac, without buying a new one.](apps/web/public/og.png)
+
 [![CI](https://github.com/smeltery/loft/actions/workflows/ci.yml/badge.svg)](https://github.com/smeltery/loft/actions/workflows/ci.yml)
 [![License: PolyForm Shield 1.0.0](https://img.shields.io/badge/license-PolyForm%20Shield%201.0.0-blue.svg)](LICENSE)
 [![Bun](https://img.shields.io/badge/bun-1.4-black?logo=bun&logoColor=white)](https://bun.sh/)
