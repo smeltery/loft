@@ -57,6 +57,12 @@ jobs:
       - run: swift run --package-path apps/macos LoftKitCheck
       - run: swift build --package-path apps/macos --product Loft
       - run: swift build --package-path apps/macos --product LoftProvider
+      - name: Verify packaged brand icons and compile the Finder symbol
+        run: |
+          xcrun --find actool
+          bash scripts/package-macos.sh
+          test -s dist/Loft.app/Contents/Resources/Loft.icns
+          test -s dist/Loft.app/Contents/PlugIns/LoftProvider.appex/Contents/Resources/Assets.car
 
   hygiene:
     name: hygiene

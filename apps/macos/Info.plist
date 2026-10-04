@@ -10,6 +10,8 @@
   <string>APPL</string>
   <key>CFBundleExecutable</key>
   <string>Loft</string>
+  <key>CFBundleIconFile</key>
+  <string>Loft.icns</string>
   <key>CFBundleShortVersionString</key>
   <string>0.1.0</string>
   <key>LSMinimumSystemVersion</key>

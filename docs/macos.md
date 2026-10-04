@@ -51,3 +51,22 @@ bun run macos:test
 bun run macos:build
 scripts/package-macos.sh
 ```
+
+## Brand icons
+
+The canonical artwork is `apps/web/public/brand/logo.svg`. Regenerate native
+black/white PNGs, multi-resolution ICNS files and the Finder sidebar symbol
+with `swift scripts/generate-macos-icons.swift "$PWD"` from the repository root.
+The white vector is also available at `apps/macos/Resources/logo-white.svg`.
+
+Menu-bar and Settings images are templates, so macOS supplies the appropriate
+contrast, including selection states. The running app switches its Dock icon
+between black and white when its effective appearance changes. Loft remains
+a menu-bar app; this does not add a permanent Dock entry.
+
+Both bundles declare a Loft icon for Finder and system dialogs. The provider
+uses the custom `LoftSidebar` SF Symbol for its Finder Locations entry, allowing
+Finder to tint it for light and dark appearances. Packaging with full Xcode
+compiles that symbol; Command Line Tools-only builds emit a warning and use
+the bundle icon fallback. CI checks the fully compiled symbol. An enabled,
+correctly signed provider installation is still needed to verify Finder UI.

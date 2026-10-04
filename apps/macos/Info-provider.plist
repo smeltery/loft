@@ -10,6 +10,16 @@
   <string>XPC!</string>
   <key>CFBundleExecutable</key>
   <string>LoftProvider</string>
+  <key>CFBundleIconFile</key>
+  <string>Loft.icns</string>
+  <key>CFBundleIcons</key>
+  <dict>
+    <key>CFBundlePrimaryIcon</key>
+    <dict>
+      <key>CFBundleSymbolName</key>
+      <string>LoftSidebar</string>
+    </dict>
+  </dict>
   <key>CFBundleShortVersionString</key>
   <string>0.1.0</string>
   <key>LSMinimumSystemVersion</key>
