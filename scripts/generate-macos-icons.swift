@@ -9,7 +9,12 @@ let regex = try NSRegularExpression(pattern: #"<path d="([^"]+)""#)
 let paths = regex.matches(in: source, range: NSRange(source.startIndex..., in: source)).map {
   String(source[Range($0.range(at: 1), in: source)!])
 }
-precondition(paths.count == 5, "Expected two cutouts and three logo shapes")
+precondition(!paths.isEmpty, "Expected logo paths")
+let viewBoxRegex = try NSRegularExpression(pattern: #"viewBox="([^"]+)""#)
+let viewBoxMatch = viewBoxRegex.firstMatch(in: source, range: NSRange(source.startIndex..., in: source))!
+let viewBox = source[Range(viewBoxMatch.range(at: 1), in: source)!].split(separator: " ").map { Double($0)! }
+precondition(viewBox.count == 4 && viewBox[2] > 0 && viewBox[3] > 0, "Expected a valid viewBox")
+let originX = viewBox[0], originY = viewBox[1], markWidth = viewBox[2], markHeight = viewBox[3]
 let compound = NSBezierPath()
 compound.windingRule = .evenOdd
 for data in paths {
@@ -42,10 +47,10 @@ func render(width: Int, height: Int, white: Bool, inset: Double = 0) -> Data {
     colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
   NSGraphicsContext.saveGraphicsState()
   NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: bitmap)
-  let scale = min(Double(width) * (1 - inset * 2) / 1434, Double(height) * (1 - inset * 2) / 1063)
+  let scale = min(Double(width) * (1 - inset * 2) / markWidth, Double(height) * (1 - inset * 2) / markHeight)
   let transform = AffineTransform(m11: scale, m12: 0, m21: 0, m22: -scale,
-    tX: (Double(width) - 1434 * scale) / 2 - 307 * scale,
-    tY: (Double(height) + 1063 * scale) / 2 + 495 * scale)
+    tX: (Double(width) - markWidth * scale) / 2 - originX * scale,
+    tY: (Double(height) + markHeight * scale) / 2 + originY * scale)
   let path = compound.copy() as! NSBezierPath
   path.transform(using: transform)
   (white ? NSColor.white : NSColor.black).setFill()
@@ -62,9 +67,16 @@ for (name, width, height, white, inset) in [
   try render(width: width, height: height, white: white, inset: inset)
     .write(to: resources.appendingPathComponent("\(name).png"))
 }
-let whiteSVG = source.replacingOccurrences(of: #"<g fill="black" mask="url(#face)">"#,
-  with: #"<g fill="white" mask="url(#face)">"#)
+let whiteSVG = source.replacingOccurrences(of: #"<g fill="black">"#,
+  with: #"<g fill="white">"#)
 try whiteSVG.write(to: resources.appendingPathComponent("logo-white.svg"), atomically: true, encoding: .utf8)
+
+let web = root.appendingPathComponent("apps/web/public")
+try whiteSVG.write(to: web.appendingPathComponent("brand/logo-white.svg"), atomically: true, encoding: .utf8)
+let favicon = source.replacingOccurrences(of: #"<g fill="black">"#,
+  with: #"<style>g { fill: black } @media (prefers-color-scheme: dark) { g { fill: white } }</style><g>"#)
+try favicon.write(to: web.appendingPathComponent("favicon.svg"), atomically: true, encoding: .utf8)
+try render(width: 360, height: 270, white: false).write(to: web.appendingPathComponent("brand/logo.png"))
 
 let temporary = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
 try FileManager.default.createDirectory(at: temporary, withIntermediateDirectories: true)
@@ -94,10 +106,10 @@ let info = #"{"info":{"author":"xcode","version":1},"symbols":[{"filename":"Loft
 try (info + "\n").write(to: symbols.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
 var guides = "", variants = ""
 for (size, baseline, height) in [("S", 698.66, 70.46), ("M", 1128.66, 88.0), ("L", 1558.66, 106.0)] {
-  let scale = height / 1063
-  let x = 1450 - 1434 * scale / 2
+  let scale = height / markHeight
+  let x = 1450 - markWidth * scale / 2
   guides += "<line id=\"Baseline-\(size)\" x1=\"263\" y1=\"\(baseline)\" x2=\"3036\" y2=\"\(baseline)\"/><line id=\"Capline-\(size)\" x1=\"263\" y1=\"\(baseline - height)\" x2=\"3036\" y2=\"\(baseline - height)\"/>"
-  variants += "<g id=\"Regular-\(size)\"><path fill-rule=\"evenodd\" transform=\"translate(\(x - 307 * scale) \(baseline - height - 495 * scale)) scale(\(scale))\" d=\"\(paths.joined(separator: " "))\"/></g>"
+  variants += "<g id=\"Regular-\(size)\"><path fill-rule=\"evenodd\" transform=\"translate(\(x - originX * scale) \(baseline - height - originY * scale)) scale(\(scale))\" d=\"\(paths.joined(separator: " "))\"/></g>"
 }
 let symbol = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 3300 2200\"><g id=\"Guides\">\(guides)</g><g id=\"Symbols\">\(variants)</g></svg>"
 try (symbol + "\n").write(to: symbols.appendingPathComponent("LoftSidebar.svg"), atomically: true, encoding: .utf8)
@@ -106,8 +118,8 @@ print("Generated Loft icons from apps/web/public/brand/logo.svg")
 // Keep the layered app icon's foreground aligned with the canonical mark.
 let layered = resources.appendingPathComponent("Loft.icon/Assets")
 try FileManager.default.createDirectory(at: layered, withIntermediateDirectories: true)
-let iconScale = 800.0 / 1434
-let iconX = 112 - 307 * iconScale
-let iconY = (1024 - 1063 * iconScale) / 2 - 495 * iconScale
+let iconScale = 800.0 / markWidth
+let iconX = 112 - originX * iconScale
+let iconY = (1024 - markHeight * iconScale) / 2 - originY * iconScale
 let foreground = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1024\" height=\"1024\" viewBox=\"0 0 1024 1024\"><path fill=\"black\" fill-rule=\"evenodd\" transform=\"translate(\(iconX) \(iconY)) scale(\(iconScale))\" d=\"\(paths.joined(separator: " "))\"/></svg>"
 try (foreground + "\n").write(to: layered.appendingPathComponent("logo.svg"), atomically: true, encoding: .utf8)

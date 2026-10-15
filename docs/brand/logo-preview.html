@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>loft — logo concept</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 48px; background: #f5f4f0; color: #20211e; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    main { max-width: 1100px; margin: auto; }
+    header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 36px; }
+    h1 { font-size: 22px; letter-spacing: -.7px; margin: 0; font-weight: 550; }
+    .eyebrow { font-size: 12px; color: #75766e; letter-spacing: 1px; text-transform: uppercase; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card { border-radius: 20px; background: white; min-height: 290px; display: flex; align-items: center; justify-content: center; position: relative; padding: 45px; }
+    .dark { background: #20211e; color: white; }
+    .label { position: absolute; bottom: 22px; left: 26px; font-size: 12px; opacity: .5; }
+    .mark { width: 176px; height: 132px; }
+    .lockup { display: flex; align-items: center; gap: 22px; }
+    .lockup img { width: 76px; height: 57px; }
+    .word { font-size: 78px; letter-spacing: -5px; font-weight: 600; }
+    .sizes { display: flex; gap: 35px; align-items: center; }
+    .sizes img { object-fit: contain; }
+    footer { padding: 28px 0 0; max-width: 650px; }
+    h2 { font-size: 22px; font-weight: 550; letter-spacing: -.6px; }
+    p { color: #75766e; font-size: 15px; line-height: 1.6; }
+    @media (max-width: 650px) { body { padding: 24px; } .grid { grid-template-columns: 1fr; } header { gap: 24px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1>loft / identity</h1><span class="eyebrow">01 — the upper room</span></header>
+    <div class="grid">
+      <section class="card"><img class="mark" src="../../apps/web/public/brand/logo.svg" alt="Black loft mark" /><span class="label">Primary mark</span></section>
+      <section class="card dark"><img class="mark" src="../../apps/web/public/brand/logo-white.svg" alt="White loft mark" /><span class="label">Reversed</span></section>
+      <section class="card"><div class="lockup"><img src="../../apps/web/public/brand/logo.svg" alt="" /><span class="word">loft.</span></div><span class="label">Wordmark pairing</span></section>
+      <section class="card"><div class="sizes"><img src="../../apps/web/public/brand/logo.svg" width="16" height="12" alt="16 pixel mark" /><img src="../../apps/web/public/brand/logo.svg" width="24" height="18" alt="24 pixel mark" /><img src="../../apps/web/public/brand/logo.svg" width="48" height="36" alt="48 pixel mark" /><img src="../../apps/web/public/brand/logo.svg" width="80" height="60" alt="80 pixel mark" /></div><span class="label">16 / 24 / 48 / 80 pixels</span></section>
+    </div>
+    <footer><h2>A little more room above.</h2><p>A floating roof over an L-shaped foundation. A simple architectural mark for the extra space loft gives your Mac.</p></footer>
+  </main>
+</body>
+</html>
