@@ -1,0 +1,90 @@
+.docs-callout-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  padding: clamp(24px, 5vw, 48px);
+  background: var(--surface);
+  border: 1px solid #0000000d;
+  border-radius: 24px;
+}
+.docs-callout-label {
+  color: var(--ink-3);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.docs-callout h2 {
+  margin-bottom: 20px;
+}
+.docs-callout-description {
+  font-size: var(--t-sm);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.docs-callout-note {
+  margin: 14px 0 0;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+.docs-callout-guides {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.docs-callout-guides li + li {
+  border-top: 1px solid #0000000d;
+}
+.docs-callout-guides a {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 24px 12px;
+  border-radius: 10px;
+  transition: background 160ms;
+}
+.docs-callout-guides a:hover {
+  background: var(--bg);
+}
+.docs-callout-number {
+  font:
+    12px / 24px ui-monospace,
+    monospace;
+  color: var(--ink-3);
+}
+.docs-callout-guide {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+}
+.docs-callout-guide strong {
+  font-size: var(--t-md);
+  font-weight: 500;
+}
+.docs-callout-guide > span {
+  font-size: var(--t-sm);
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.docs-callout-arrow {
+  font-size: 18px;
+}
+.docs-callout a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+@media (max-width: 700px) {
+  .docs-callout-card {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .docs-callout-guides a {
+    padding-inline: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-callout-guides a {
+    transition: none;
+  }
+}

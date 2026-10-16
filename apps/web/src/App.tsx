@@ -1,5 +1,6 @@
 import { AppleLogo } from './components/apple-logo'
 import Compare from './components/compare'
+import DocsCallout from './components/docs-callout'
 import Faq from './components/faq'
 import Stories from './components/features/stories'
 import Hero from './components/hero'
@@ -41,6 +42,7 @@ export default function App() {
         <Pain />
         <Compare />
         <Pricing />
+        <DocsCallout />
         <Faq />
         <section className="ending wrap" id="download">
           <h2>

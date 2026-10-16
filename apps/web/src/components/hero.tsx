@@ -26,8 +26,8 @@ export default function Hero() {
           <AppleLogo />
           download for mac
         </a>
-        <a className="pill docs-cta" href="/docs/quick-start">
-          get started <span aria-hidden="true">→</span>
+        <a className="pill docs-cta" href="/docs">
+          read the docs <span aria-hidden="true">→</span>
         </a>
       </div>
       <p className="fine">free to download · needs macos 26</p>
