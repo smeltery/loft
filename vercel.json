@@ -2,12 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "installCommand": "bun install --frozen-lockfile",
-  "buildCommand": "bun run build --filter=@loft/web",
+  "buildCommand": "VITE_MARKETING_ONLY=true bun run build --filter=@loft/web",
   "outputDirectory": "apps/web/dist",
+  "redirects": [
+    { "source": "/app/:path*", "destination": "/", "permanent": false }
+  ],
   "rewrites": [
-    { "source": "/app/:path*", "destination": "/index.html" },
-    { "source": "/s/:path*", "destination": "/index.html" },
-    { "source": "/r/:path*", "destination": "/index.html" },
     { "source": "/privacy", "destination": "/index.html" },
     { "source": "/terms", "destination": "/index.html" }
   ]

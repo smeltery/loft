@@ -20,14 +20,16 @@ import { appPath } from './app-route'
 import { legalPath, LegalPage } from './legal'
 
 export default function App() {
-  const token = requestToken()
-  if (token) return <RequestPage token={token} />
-  const shared = shareId()
-  if (shared) return <SharePage id={shared} />
+  if (import.meta.env.VITE_MARKETING_ONLY !== 'true') {
+    const token = requestToken()
+    if (token) return <RequestPage token={token} />
+    const shared = shareId()
+    if (shared) return <SharePage id={shared} />
+    const shell = appPath()
+    if (shell) return <AppShell path={shell} />
+  }
   const legal = legalPath()
   if (legal) return <LegalPage kind={legal} />
-  const shell = appPath()
-  if (shell) return <AppShell path={shell} />
   return (
     <>
       <TopBar />

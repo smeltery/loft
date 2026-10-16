@@ -18,6 +18,8 @@ describe('marketing page', () => {
     expect(html).toContain('Client Work')
     expect(html).toContain('download for mac')
     expect(html).toContain('free forever')
+    expect(html).toContain('https://github.com/smeltery/loft#quick-start')
+    expect(html).not.toContain('href="/app"')
     expect(html).toContain('privacy')
     expect(html).toContain('orbit-mark')
     expect(html).toContain('forest-6')

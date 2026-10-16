@@ -19,6 +19,11 @@ bun --filter @loft/api dev
 
 Set `VITE_API=http://127.0.0.1:8787` when the web app is not on the same host.
 
+The public Vercel site is marketing only. It builds with
+`VITE_MARKETING_ONLY=true`, redirects `/app` to the home page, and does not host
+share or upload-request pages. Self-hosted builds leave this flag unset and use
+`/app`, `/s/<id>`, and `/r/<token>` with their own storage API.
+
 Or run only the API in Docker:
 
 ```bash

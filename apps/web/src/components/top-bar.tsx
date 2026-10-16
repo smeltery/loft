@@ -7,9 +7,7 @@ export default function TopBar() {
       <a href="#how">how it works</a>
       <a href="#pricing">plan</a>
       <a href="#faq">faq</a>
-      <a className="nav-account" href="/app">
-        app
-      </a>
+      <a href="https://github.com/smeltery/loft#quick-start">self-host</a>
     </nav>
   )
 }

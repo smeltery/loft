@@ -167,8 +167,7 @@ ol {
 .nav .nav-home {
   font-weight: 600;
 }
-.nav a.on,
-.nav .nav-account {
+.nav a.on {
   color: var(--ink);
 }
 .nav a.on {

@@ -3,7 +3,11 @@
   "agentGuidance": false,
   "tasks": {
     "dev": { "cache": false, "persistent": true },
-    "build": { "dependsOn": ["^build"], "outputs": ["dist/**"] },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"],
+      "env": ["VITE_MARKETING_ONLY", "VITE_API"]
+    },
     "test": { "outputs": [] },
     "lint": {},
     "typecheck": { "dependsOn": ["^typecheck"] }
