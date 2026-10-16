@@ -9,6 +9,7 @@ dist/
 coverage/
 *.log
 .turbo/
+.vercel/
 .corepack/
 .build/
 DerivedData/
