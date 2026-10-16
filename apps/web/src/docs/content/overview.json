@@ -1,0 +1,90 @@
+{
+  "path": "/docs",
+  "title": "Overview",
+  "group": "Start here",
+  "description": "What loft does, how your files move between Finder and your storage, and how to run your own installation.",
+  "sections": [
+    {
+      "id": "introduction",
+      "title": "More room on your Mac. Your own cloud.",
+      "paragraphs": [
+        "loft is a free, self-hosted drive for macOS. It brings files in your storage into Finder so you can browse them without keeping a full local copy. The menu-bar app handles search, uploads, sharing, and settings.",
+        "You run the storage API and choose where the bytes live: a local disk or an S3 bucket. There is no hosted loft account or subscription. This website provides downloads and documentation; it does not store your files."
+      ]
+    },
+    {
+      "id": "workflow",
+      "title": "How a file reaches Finder",
+      "paragraphs": [
+        "The Mac client talks to your storage API with an access token. File metadata tells Finder what is available. Opening a file asks the API for its contents, including byte ranges where supported, and the API reads those bytes from your storage.",
+        "Keep on This Mac requests a local download for offline use. Those downloaded files consume disk space. A correctly signed File Provider installation is required for the native Finder drive."
+      ],
+      "diagram": "storage"
+    },
+    {
+      "id": "requirements",
+      "title": "What you need",
+      "paragraphs": [
+        "Start locally with Bun or Docker, then configure your own server and storage before connecting a remote Mac."
+      ],
+      "items": [
+        "macOS 26 or newer for the distributed Mac app; full Xcode 26 or newer when packaging from source.",
+        "A server running the Bun storage API, with persistent disk storage or an S3 bucket.",
+        "Your own access token and an HTTPS endpoint for remote access.",
+        "A self-hosted web build if you want browser management, share landings, or file requests."
+      ],
+      "links": [
+        {
+          "label": "Run the quick start",
+          "href": "/docs/quick-start"
+        },
+        {
+          "label": "Connect your Mac",
+          "href": "/docs/guides/macos"
+        }
+      ]
+    },
+    {
+      "id": "hosting",
+      "title": "Hosting and operational costs",
+      "paragraphs": [
+        "loft has no software subscription. You pay your infrastructure provider for storage, compute, and network transfer. The repository\u2019s PolyForm Shield license applies.",
+        "The API is designed around one trusted operator and one writer per store. Additional tokens access the same store; they do not create separate user accounts. Back up file data, metadata, sharing records, and configuration."
+      ]
+    },
+    {
+      "id": "base-url",
+      "title": "Your API, your address",
+      "paragraphs": [
+        "The local API defaults to http://127.0.0.1:8787. Remote clients must use your server\u2019s address. The public loft website is not an API endpoint."
+      ],
+      "code": "curl --fail http://127.0.0.1:8787/health",
+      "language": "Shell"
+    },
+    {
+      "id": "next-steps",
+      "title": "Where to go next",
+      "paragraphs": [
+        "The quick start gets a local server running. Deployment and storage guides cover persistence and remote access; the API reference explains the calls used by the clients."
+      ],
+      "links": [
+        {
+          "label": "Quick start",
+          "href": "/docs/quick-start"
+        },
+        {
+          "label": "Docker deployment",
+          "href": "/docs/guides/deployment"
+        },
+        {
+          "label": "API reference",
+          "href": "/docs/api"
+        },
+        {
+          "label": "Runnable examples",
+          "href": "/docs/examples"
+        }
+      ]
+    }
+  ]
+}

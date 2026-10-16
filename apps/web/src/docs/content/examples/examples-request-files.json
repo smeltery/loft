@@ -1,0 +1,39 @@
+{
+  "path": "/docs/examples/request-files",
+  "title": "Collect a file request",
+  "group": "Examples",
+  "description": "Issue an upload destination, then let a recipient upload without your operator token.",
+  "sections": [
+    {
+      "id": "create",
+      "title": "Create the request",
+      "paragraphs": [
+        "The operator runs this authenticated call. Copy the token from the returned request URL and give the URL to the recipient."
+      ],
+      "code": "curl --fail-with-body -X POST \\\n  -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\"folder\":\"Inbox\"}' \\\n  \"$LOFT_API/v1/requests\"",
+      "language": "cURL"
+    },
+    {
+      "id": "upload",
+      "title": "Upload as the recipient",
+      "paragraphs": [
+        "This call uses the request token, not the operator token. The server saves the upload to the destination chosen when the request was issued."
+      ],
+      "code": "export REQUEST_TOKEN=\"<token-from-issued-url>\"\ncurl --fail-with-body -X PUT \\\n  -H \"X-Loft-Name: notes.txt\" \\\n  -H \"Content-Type: text/plain\" \\\n  --data-binary @notes.txt \\\n  \"$LOFT_API/r/$REQUEST_TOKEN\"",
+      "language": "cURL"
+    },
+    {
+      "id": "close",
+      "title": "Close when finished",
+      "paragraphs": [
+        "Use the request record ID with DELETE /v1/sharing/:link. Existing uploads remain in your storage; future uploads through the closed request are rejected."
+      ],
+      "links": [
+        {
+          "label": "Manage shared links",
+          "href": "/docs/api/sharing"
+        }
+      ]
+    }
+  ]
+}

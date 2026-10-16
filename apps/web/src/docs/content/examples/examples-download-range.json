@@ -1,0 +1,30 @@
+{
+  "path": "/docs/examples/download-range",
+  "title": "Download a byte range",
+  "group": "Examples",
+  "description": "Read a portion of a file without fetching its entire contents.",
+  "sections": [
+    {
+      "id": "range",
+      "title": "Request an inclusive range",
+      "paragraphs": [
+        "Replace FILE_ID with an existing file that has at least 1,024 bytes. Range offsets are inclusive, so 0\u20131023 requests exactly 1,024 bytes."
+      ],
+      "code": "export FILE_ID=\"<existing-file-id>\"\ncurl --fail --dump-header range-headers.txt \\\n  -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  -H \"Range: bytes=0-1023\" \\\n  \"$LOFT_API/v1/files/$FILE_ID/content\" -o first-kib.bin\nwc -c first-kib.bin",
+      "language": "Shell"
+    },
+    {
+      "id": "verify",
+      "title": "Verify the response",
+      "paragraphs": [
+        "A valid partial response has status 206 and a Content-Range header. When reading a file in multiple requests, use If-Match with its ETag so a concurrent edit cannot mix versions."
+      ],
+      "links": [
+        {
+          "label": "Version protection",
+          "href": "/docs/api/files#versions"
+        }
+      ]
+    }
+  ]
+}

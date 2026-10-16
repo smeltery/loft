@@ -1,0 +1,29 @@
+{
+  "path": "/docs/examples",
+  "title": "Examples",
+  "group": "Examples",
+  "description": "Small, complete workflows for your own loft installation.",
+  "sections": [
+    {
+      "id": "choose",
+      "title": "Choose a workflow",
+      "paragraphs": [
+        "These examples call your server directly. Set LOFT_API and LOFT_TOKEN in your shell first; keep the token out of source control."
+      ],
+      "links": [
+        {
+          "label": "Upload a file",
+          "href": "/docs/examples/upload-file"
+        },
+        {
+          "label": "Download a byte range",
+          "href": "/docs/examples/download-range"
+        },
+        {
+          "label": "Collect a file request",
+          "href": "/docs/examples/request-files"
+        }
+      ]
+    }
+  ]
+}

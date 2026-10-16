@@ -1,0 +1,54 @@
+{
+  "path": "/docs/guides/deployment",
+  "title": "Docker deployment",
+  "group": "Guides",
+  "description": "Run the API with persistent storage and put your own HTTPS endpoint in front of it.",
+  "sections": [
+    {
+      "id": "image",
+      "title": "Build the image",
+      "paragraphs": [
+        "Run these commands from the loft repository. This uses the storage API Dockerfile, not a hosted loft service."
+      ],
+      "code": "docker build -f apps/api/Dockerfile -t loft-api .\ndocker volume create loft-data",
+      "language": "Terminal"
+    },
+    {
+      "id": "run",
+      "title": "Start with persistent disk storage",
+      "paragraphs": [
+        "Set your credentials before starting the container. The named volume preserves file data, metadata, and issued links when the container is replaced. The port binds to loopback so a reverse proxy can expose it."
+      ],
+      "code": "export LOFT_TOKEN=\"$(openssl rand -hex 32)\"\nexport LOFT_SIGNING_KEY=\"$(openssl rand -hex 32)\"\ndocker run -d --name loft-api --restart unless-stopped \\\n  -p 127.0.0.1:8787:8787 \\\n  -v loft-data:/data \\\n  -e LOFT_DATA=/data -e LOFT_TOKEN -e LOFT_SIGNING_KEY \\\n  -e LOFT_ORIGIN=https://api.example.com \\\n  -e LOFT_WEB=https://files.example.com \\\n  loft-api",
+      "language": "Terminal"
+    },
+    {
+      "id": "https",
+      "title": "Add HTTPS and verify",
+      "paragraphs": [
+        "Replace the example domains with your own. Configure a TLS reverse proxy to forward your API hostname to 127.0.0.1:8787. Allow the request sizes and transfer durations your files need.",
+        "LOFT_ORIGIN describes the API origin; it does not configure TLS. LOFT_WEB is the origin of your self-hosted web pages for issued links."
+      ],
+      "code": "curl --fail https://api.example.com/health",
+      "language": "Shell"
+    },
+    {
+      "id": "operate",
+      "title": "Operate one writer per store",
+      "paragraphs": [
+        "Run one API writer against a given store. Metadata and link updates are serialized within one process; multiple writers need transactional coordination that is not currently implemented.",
+        "Back up the volume and preserve your credentials in a secret manager. The repository\u2019s development Compose file does not currently attach its declared named volume to the API service; use the explicit volume mount above for persistence."
+      ],
+      "links": [
+        {
+          "label": "Choose disk or S3",
+          "href": "/docs/guides/storage"
+        },
+        {
+          "label": "Host the web interface",
+          "href": "/docs/guides/web-interface"
+        }
+      ]
+    }
+  ]
+}

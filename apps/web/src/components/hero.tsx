@@ -21,10 +21,15 @@ export default function Hero() {
         <strong>more space</strong> for your mac, <mark>without</mark> buying a
         new one.
       </p>
-      <a className="pill pill-dark" href={site.downloadHref}>
-        <AppleLogo />
-        download for mac
-      </a>
+      <div className="hero-actions">
+        <a className="pill pill-dark" href={site.downloadHref}>
+          <AppleLogo />
+          download for mac
+        </a>
+        <a className="pill docs-cta" href="/docs/quick-start">
+          get started <span aria-hidden="true">→</span>
+        </a>
+      </div>
       <p className="fine">free to download · needs macos 26</p>
       <div className="lt-pair">
         <p className="lifetime">
@@ -39,7 +44,7 @@ export default function Hero() {
             <b>free forever</b> · no credit card
           </span>
         </p>
-        <a className="lifetime lt-offer" href="#pricing">
+        <a className="lifetime lt-offer" href="/docs/quick-start">
           <span>
             <mark className="marker">self-host</mark> on your own cloud · open
             source

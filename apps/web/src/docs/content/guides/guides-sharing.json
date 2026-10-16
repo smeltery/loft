@@ -1,0 +1,52 @@
+{
+  "path": "/docs/guides/sharing",
+  "title": "Sharing and file requests",
+  "group": "Guides",
+  "description": "Send files or collect uploads using links issued by your own server.",
+  "sections": [
+    {
+      "id": "origins",
+      "title": "Configure your link origin",
+      "paragraphs": [
+        "Set LOFT_WEB to your self-hosted web origin. Your web build uses VITE_API to reach the API. Do not use the public marketing site as a share destination."
+      ]
+    },
+    {
+      "id": "shares",
+      "title": "Issue a share link",
+      "paragraphs": [
+        "An authenticated request creates a persisted share record and returns its signed URL. Links expire after seven days. A valid signature alone is not enough: the issued record must still be active and its file available."
+      ],
+      "code": "curl --fail -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  \"$LOFT_API/v1/files/hello/share\"",
+      "language": "cURL",
+      "diagram": "sharing"
+    },
+    {
+      "id": "requests",
+      "title": "Collect files in a destination",
+      "paragraphs": [
+        "Issue a file request with its destination folder. Recipients upload through the request token; the server uses the saved destination rather than trusting an upload header."
+      ],
+      "code": "curl --fail -X POST \\\n  -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  --data '{\"folder\":\"Inbox\"}' \\\n  \"$LOFT_API/v1/requests\"",
+      "language": "cURL"
+    },
+    {
+      "id": "revoke",
+      "title": "Revoke links or close requests",
+      "paragraphs": [
+        "List active records with GET /v1/sharing. DELETE /v1/sharing/<link-id> stops subsequent access without deleting the file or previously received uploads. Transfers already in progress may finish.",
+        "Open counts measure successful metadata requests, including repeated visits. Upload counts measure successful uploads. They are not unique-visitor analytics."
+      ],
+      "links": [
+        {
+          "label": "Request-files example",
+          "href": "/docs/examples/request-files"
+        },
+        {
+          "label": "Sharing API",
+          "href": "/docs/api/sharing"
+        }
+      ]
+    }
+  ]
+}

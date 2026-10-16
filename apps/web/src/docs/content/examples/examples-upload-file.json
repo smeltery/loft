@@ -1,0 +1,30 @@
+{
+  "path": "/docs/examples/upload-file",
+  "title": "Upload a file",
+  "group": "Examples",
+  "description": "Create a small file, upload it to Inbox, then download and verify the content.",
+  "sections": [
+    {
+      "id": "run",
+      "title": "Upload and read back",
+      "paragraphs": [
+        "Run in a shell with LOFT_API and LOFT_TOKEN configured. The example uses a unique ID to avoid replacing an existing file."
+      ],
+      "code": "set -eu\nFILE_ID=\"hello-$(date +%s)\"\nprintf \"Hello from loft.\\n\" > hello.txt\ncurl --fail-with-body -X PUT \\\n  -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  -H \"X-Loft-Name: hello.txt\" \\\n  -H \"X-Loft-Folder: Inbox\" \\\n  -H \"Content-Type: text/plain\" \\\n  --data-binary @hello.txt \\\n  \"$LOFT_API/v1/files/$FILE_ID/content\"\ncurl --fail -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  \"$LOFT_API/v1/files/$FILE_ID/content\" -o hello-downloaded.txt\ncmp hello.txt hello-downloaded.txt",
+      "language": "Shell"
+    },
+    {
+      "id": "next",
+      "title": "Use your own files",
+      "paragraphs": [
+        "Replace hello.txt, its display name, and its content type with your own file. Keep the returned file metadata if you plan to use version-guarded updates."
+      ],
+      "links": [
+        {
+          "label": "File transfer reference",
+          "href": "/docs/api/files"
+        }
+      ]
+    }
+  ]
+}

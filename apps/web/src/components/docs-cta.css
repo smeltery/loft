@@ -1,0 +1,36 @@
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.docs-cta {
+  border: 1px solid #00000020;
+  background: #ffffff80;
+  color: var(--ink);
+}
+.docs-cta:hover {
+  background: white;
+  border-color: #00000040;
+}
+.docs-cta span {
+  transition: transform 160ms;
+}
+.docs-cta:hover span {
+  transform: translateX(3px);
+}
+.setup-link {
+  display: block;
+  margin: 18px auto 0;
+  font-size: var(--t-sm);
+  text-underline-offset: 4px;
+}
+.setup-link:hover {
+  text-decoration: underline;
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-cta span {
+    transition: none;
+  }
+}

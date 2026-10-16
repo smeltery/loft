@@ -1,0 +1,52 @@
+{
+  "path": "/docs/guides/authentication",
+  "title": "Authentication",
+  "group": "Guides",
+  "description": "Configure operator credentials and understand the difference between an access token and a public link.",
+  "sections": [
+    {
+      "id": "operator-token",
+      "title": "Choose an operator token",
+      "paragraphs": [
+        "LOFT_TOKEN is the primary bearer token. It defaults to dev for local development; choose a random value before exposing the API remotely. All authenticated clients of this installation share its store."
+      ],
+      "code": "export LOFT_TOKEN=\"$(openssl rand -hex 32)\"\nexport LOFT_SIGNING_KEY=\"$(openssl rand -hex 32)\"",
+      "language": "Shell"
+    },
+    {
+      "id": "requests",
+      "title": "Authenticate requests",
+      "paragraphs": [
+        "Send Authorization: Bearer followed by the exact token on /v1 requests. GET /health is unauthenticated."
+      ],
+      "code": "curl --fail -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  \"$LOFT_API/v1/me\"",
+      "language": "cURL"
+    },
+    {
+      "id": "extra-tokens",
+      "title": "Additional tokens and rotation",
+      "paragraphs": [
+        "LOFT_TOKENS accepts a comma-separated list of additional tokens. These grant access to the same data, not isolated accounts. During rotation, update your clients, then remove the old token and restart the service.",
+        "Set a separate, stable LOFT_SIGNING_KEY if access-token rotation should not change the key used to validate share URLs. Changing the signing key invalidates existing signatures."
+      ]
+    },
+    {
+      "id": "browser",
+      "title": "Browser credentials",
+      "paragraphs": [
+        "The self-hosted browser interface stores its operator token locally in that browser. Use it only on a web origin you control. Never put LOFT_TOKEN in a VITE_ variable, which would bundle the secret into public JavaScript.",
+        "Share recipients use a signed URL. File-request recipients use an issued request token. Neither needs your operator token."
+      ],
+      "links": [
+        {
+          "label": "Sharing and file requests",
+          "href": "/docs/guides/sharing"
+        },
+        {
+          "label": "Environment variables",
+          "href": "/docs/reference/configuration"
+        }
+      ]
+    }
+  ]
+}

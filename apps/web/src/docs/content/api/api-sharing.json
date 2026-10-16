@@ -1,0 +1,50 @@
+{
+  "path": "/docs/api/sharing",
+  "title": "Links and requests",
+  "group": "API endpoints",
+  "description": "Issue records, access public content, and stop future access.",
+  "sections": [
+    {
+      "id": "issue",
+      "title": "Issue a share",
+      "paragraphs": [
+        "GET /v1/files/:id/share requires operator authentication. Preserve the full returned URL, including exp and sig. Do not construct your own untracked URL.",
+        "GET /s/:link/meta returns metadata and records an open. GET /s/:link returns file bytes. Both validate the signature, expiry, and issued record."
+      ]
+    },
+    {
+      "id": "request",
+      "title": "Issue a file request",
+      "paragraphs": [
+        "POST /v1/requests accepts a JSON object with folder. GET /r/:token describes an active request; PUT /r/:token uploads raw bytes into that saved folder.",
+        "X-Loft-Name supplies the uploaded filename. Public upload headers cannot change the saved destination."
+      ]
+    },
+    {
+      "id": "manage",
+      "title": "Manage active records",
+      "paragraphs": [
+        "GET /v1/sharing lists active records and their URLs. DELETE /v1/sharing/:link revokes a share or closes a request. Both require the operator bearer."
+      ],
+      "code": "curl --fail -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  \"$LOFT_API/v1/sharing\"\n\ncurl --fail -X DELETE \\\n  -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  \"$LOFT_API/v1/sharing/<link-id>\"",
+      "language": "cURL"
+    },
+    {
+      "id": "expiry",
+      "title": "Expiry and revocation",
+      "paragraphs": [
+        "Issued shares and requests expire after seven days. Revocation stops subsequent requests; in-flight transfers may finish. Revoking a link does not remove the underlying file or previously received uploads."
+      ],
+      "links": [
+        {
+          "label": "Sharing guide",
+          "href": "/docs/guides/sharing"
+        },
+        {
+          "label": "Request-files example",
+          "href": "/docs/examples/request-files"
+        }
+      ]
+    }
+  ]
+}

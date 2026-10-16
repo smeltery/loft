@@ -1,0 +1,52 @@
+{
+  "path": "/docs/guides/storage",
+  "title": "Storage backends",
+  "group": "Guides",
+  "description": "Choose local disk or an S3 bucket while keeping the same client-facing API.",
+  "sections": [
+    {
+      "id": "disk",
+      "title": "Local disk",
+      "paragraphs": [
+        "Without LOFT_BUCKET, the API uses the disk backend. LOFT_DATA selects the root directory and defaults to .loft-data. Persist and back up the whole directory, including metadata and links."
+      ],
+      "code": "LOFT_DATA=/srv/loft-data bun --filter @loft/api dev",
+      "language": "Terminal"
+    },
+    {
+      "id": "s3",
+      "title": "S3 storage",
+      "paragraphs": [
+        "Set LOFT_BUCKET to enable the S3 backend. AWS_REGION defaults to us-east-1. Credentials come from AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY as configured for Bun\u2019s S3 client. AWS_ENDPOINT can select an S3-compatible endpoint."
+      ],
+      "code": "export LOFT_BUCKET=\"your-loft-bucket\"\nexport AWS_REGION=\"us-east-1\"\n# Supply AWS credentials through your deployment environment.\nbun --filter @loft/api dev",
+      "language": "Shell"
+    },
+    {
+      "id": "metadata",
+      "title": "Preserve metadata and links",
+      "paragraphs": [
+        "A file\u2019s bytes, metadata, and issued-link records form the store. Copying object bytes alone is not a complete backup. There is no automatic migration when you change backends.",
+        "Run one writer per store, and verify restore procedures before relying on the installation for your only copy of important files."
+      ]
+    },
+    {
+      "id": "aws",
+      "title": "AWS infrastructure",
+      "paragraphs": [
+        "The repository includes Terraform in infra/aws for a private bucket, CloudFront, ECR, and an optional ECS Fargate service behind an ALB. The service starts with desired count zero until an image is published.",
+        "Review the infrastructure and its costs before applying it. Set loft_token explicitly, publish the API image to the created ECR repository, and use your own HTTPS origin for clients."
+      ],
+      "links": [
+        {
+          "label": "Deployment guide",
+          "href": "/docs/guides/deployment"
+        },
+        {
+          "label": "Configuration reference",
+          "href": "/docs/reference/configuration"
+        }
+      ]
+    }
+  ]
+}

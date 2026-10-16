@@ -1,0 +1,51 @@
+{
+  "path": "/docs/guides/web-interface",
+  "title": "Self-hosted web interface",
+  "group": "Guides",
+  "description": "Host browser management and public file landings alongside your own storage API.",
+  "sections": [
+    {
+      "id": "roles",
+      "title": "Separate your web and API origins",
+      "paragraphs": [
+        "The public loft site is documentation and marketing only. Your installation can serve /app for management, /s/<link> for shares, and /r/<token> for file requests.",
+        "Set VITE_API to the API origin when building the web interface. Set LOFT_WEB on the API to the origin where you serve those pages."
+      ]
+    },
+    {
+      "id": "build",
+      "title": "Build for your installation",
+      "paragraphs": [
+        "Leave VITE_MARKETING_ONLY unset for a self-hosted installation. It is enabled only for the public marketing deployment."
+      ],
+      "code": "VITE_API=https://api.example.com bun run build --filter=@loft/web",
+      "language": "Terminal"
+    },
+    {
+      "id": "serve",
+      "title": "Serve the static output",
+      "paragraphs": [
+        "Publish apps/web/dist using your own static web server. Configure /app, /app/*, /s/*, and /r/* to fall back to index.html so direct links work.",
+        "The repository\u2019s Vercel configuration intentionally redirects /app and omits share/request routes for the public site. Use your own hosting configuration for the self-hosted interface."
+      ]
+    },
+    {
+      "id": "token",
+      "title": "Connect in your browser",
+      "paragraphs": [
+        "Open /app on your web origin and enter your operator token in settings. That token is stored locally in the browser and is sent to the configured API. It is not a hosted loft login.",
+        "When changing VITE_API, rebuild the frontend. Restarting a static server does not update the API origin embedded in its JavaScript."
+      ],
+      "links": [
+        {
+          "label": "Authentication",
+          "href": "/docs/guides/authentication"
+        },
+        {
+          "label": "Sharing and file requests",
+          "href": "/docs/guides/sharing"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "path": "/docs/api",
+  "title": "API reference",
+  "group": "Reference",
+  "description": "The HTTP interface for your self-hosted storage, file management, and public links.",
+  "sections": [
+    {
+      "id": "base",
+      "title": "Base URL and authentication",
+      "paragraphs": [
+        "Use your API origin, locally http://127.0.0.1:8787. The examples use LOFT_API and LOFT_TOKEN environment variables. /v1 endpoints require a bearer token; /health is public."
+      ],
+      "code": "curl --fail -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  \"$LOFT_API/v1/me\"",
+      "language": "cURL"
+    },
+    {
+      "id": "files",
+      "title": "Files and content",
+      "paragraphs": [
+        "File IDs identify objects independently of their display names. Uploads can supply X-Loft-Name, X-Loft-Folder, and Content-Type headers."
+      ],
+      "table": [
+        ["Method", "Path", "Purpose"],
+        ["GET", "/v1/me", "Operator email, file count, and bytes"],
+        ["GET", "/v1/files", "List files; ?trash=1 selects trash"],
+        ["GET", "/v1/files/:id", "Read file metadata"],
+        ["GET", "/v1/files/:id/content", "Read bytes, optionally with Range"],
+        ["PUT", "/v1/files/:id/content", "Create or replace content"],
+        ["POST", "/v1/files/:id/keep", "Mark file kept"],
+        ["DELETE", "/v1/files/:id", "Move file to trash"],
+        ["POST", "/v1/files/:id/restore", "Restore from trash"],
+        ["POST", "/v1/trash/purge", "Purge trash older than 30 days"]
+      ],
+      "links": [
+        {
+          "label": "File transfers",
+          "href": "/docs/api/files"
+        }
+      ]
+    },
+    {
+      "id": "sharing",
+      "title": "Sharing endpoints",
+      "paragraphs": [
+        "The operator issues and revokes records; recipients use those issued links."
+      ],
+      "table": [
+        ["Method", "Path", "Purpose"],
+        ["GET", "/v1/files/:id/share", "Issue signed share URL"],
+        ["GET", "/v1/sharing", "List active links and requests"],
+        ["DELETE", "/v1/sharing/:link", "Revoke share or close request"],
+        ["POST", "/v1/requests", "Issue request with a folder"],
+        ["GET", "/s/:link/meta", "Public metadata with exp and sig"],
+        ["GET", "/s/:link", "Public bytes with exp and sig"],
+        ["GET", "/r/:token", "Request destination and expiry"],
+        ["PUT", "/r/:token", "Upload into the saved destination"]
+      ],
+      "links": [
+        {
+          "label": "Sharing API details",
+          "href": "/docs/api/sharing"
+        }
+      ]
+    },
+    {
+      "id": "health",
+      "title": "Health check",
+      "paragraphs": [
+        "GET /health returns a JSON object with ok: true when the process handles the request. It is a liveness check, not a full backup or storage-integrity check."
+      ],
+      "code": "curl --fail \"$LOFT_API/health\"",
+      "language": "cURL"
+    }
+  ]
+}

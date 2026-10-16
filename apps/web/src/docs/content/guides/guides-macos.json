@@ -1,0 +1,64 @@
+{
+  "path": "/docs/guides/macos",
+  "title": "macOS and Finder",
+  "group": "Guides",
+  "description": "Connect the menu-bar app to your API and understand what the native Finder integration requires.",
+  "sections": [
+    {
+      "id": "install",
+      "title": "Install or build loft",
+      "paragraphs": [
+        "Use the macOS download on the home page, or build from source with the repository\u2019s tooling. Packaging requires full Xcode 26 or newer."
+      ],
+      "code": "bun run macos:test\nbun run macos:build\nscripts/package-macos.sh",
+      "language": "Terminal"
+    },
+    {
+      "id": "connect",
+      "title": "Connect to your server",
+      "paragraphs": [
+        "The Mac client reads LOFT_API and LOFT_TOKEN from its launch environment. For a source build, quit any running copy and launch the binary directly with these values."
+      ],
+      "code": "LOFT_API=\"https://api.example.com\" \\\nLOFT_TOKEN=\"<your-token>\" \\\n  ./dist/Loft.app/Contents/MacOS/Loft",
+      "language": "Terminal"
+    },
+    {
+      "id": "finder",
+      "title": "Enable the Finder drive",
+      "paragraphs": [
+        "The File Provider extension must be correctly signed, entitled, and enabled for Finder to show the drive. The packaging script uses an ad-hoc signature for local builds, so a successful build alone does not verify Finder integration.",
+        "Open in Finder reports when the provider is unavailable. Folder creation and metadata-only moves or renames are not currently implemented."
+      ]
+    },
+    {
+      "id": "everyday",
+      "title": "Use loft from the menu bar",
+      "paragraphs": [
+        "Search Loft uses Control-Option-O to find remote files. Drop files onto the menu-bar icon and choose a destination. Settings shows measured local capacity, cloud usage, and provider availability."
+      ],
+      "items": [
+        "Search lists remote files and reports connection errors.",
+        "Drop keeps failed uploads available for retry.",
+        "Copy Loft Link and Request Files create records on your server.",
+        "Keep on This Mac requests Finder materialization for offline use."
+      ]
+    },
+    {
+      "id": "offline",
+      "title": "Keep files offline",
+      "paragraphs": [
+        "Pinned files are stored on this device and use real disk space. Wait for Finder materialization to finish before going offline. Closing the transfer panel stops waiting; Finder continues managing the download."
+      ],
+      "links": [
+        {
+          "label": "Share files from your server",
+          "href": "/docs/guides/sharing"
+        },
+        {
+          "label": "Troubleshoot errors",
+          "href": "/docs/reference/errors"
+        }
+      ]
+    }
+  ]
+}

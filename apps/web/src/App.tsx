@@ -1,23 +1,23 @@
 import { AppleLogo } from './components/apple-logo'
 import Compare from './components/compare'
 import Faq from './components/faq'
+import Stories from './components/features/stories'
 import Hero from './components/hero'
 import How from './components/how'
 import Pain from './components/pain'
 import Pricing from './components/pricing'
-import Stories from './components/features/stories'
 import Story from './components/story'
 import TopBar from './components/top-bar'
 import { site } from './copy'
 import { Logo } from './logo'
 import { RequestPage } from './request-page'
 import './promo.css'
-import { requestToken } from './request-token'
-import { SharePage } from './share-page'
-import { shareId } from './share-id'
-import { AppShell } from './app-shell'
 import { appPath } from './app-route'
-import { legalPath, LegalPage } from './legal'
+import { AppShell } from './app-shell'
+import { LegalPage, legalPath } from './legal'
+import { requestToken } from './request-token'
+import { shareId } from './share-id'
+import { SharePage } from './share-page'
 
 export default function App() {
   if (import.meta.env.VITE_MARKETING_ONLY !== 'true') {
@@ -57,6 +57,8 @@ export default function App() {
       </main>
       <footer className="foot">
         <p>
+          <a href="/docs">docs</a>
+          <span aria-hidden="true">·</span>
           <a href="/privacy">privacy</a>
           <span aria-hidden="true">·</span>
           <a href="/terms">terms</a>

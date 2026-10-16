@@ -1,8 +1,9 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { docsPages } from './docs-build'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), docsPages()],
   appType: 'spa',
   server: {
     port: 3000,

@@ -1,0 +1,61 @@
+{
+  "path": "/docs/reference/configuration",
+  "title": "Environment variables",
+  "group": "Reference",
+  "description": "The settings used by the API, web build, and Mac client.",
+  "sections": [
+    {
+      "id": "api",
+      "title": "API configuration",
+      "paragraphs": [
+        "Set these in the server environment before starting the API."
+      ],
+      "table": [
+        ["Variable", "Purpose / default"],
+        ["PORT", "Listen port; 8787"],
+        ["LOFT_TOKEN", "Primary bearer token; dev for local development"],
+        ["LOFT_TOKENS", "Additional comma-separated bearers; same store"],
+        [
+          "LOFT_SIGNING_KEY",
+          "Share-signature secret; falls back to LOFT_TOKEN"
+        ],
+        ["LOFT_DATA", "Disk root; .loft-data"],
+        ["LOFT_BUCKET", "Enable S3 using this bucket"],
+        ["AWS_REGION", "S3 region; us-east-1"],
+        ["AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY", "S3 credentials"],
+        ["AWS_ENDPOINT", "Optional S3-compatible endpoint"],
+        ["LOFT_ORIGIN", "API origin; defaults to local listen port"],
+        ["LOFT_WEB", "Web origin for issued links; defaults to API origin"],
+        ["LOFT_EMAIL", "Operator email returned by /v1/me"],
+        ["LOFT_BPS", "Optional download pacing in bytes per second"]
+      ]
+    },
+    {
+      "id": "web",
+      "title": "Web build",
+      "paragraphs": [
+        "Vite embeds these values at build time. Rebuild when changing them. Never place a secret in a VITE_ variable."
+      ],
+      "table": [
+        ["Variable", "Purpose / default"],
+        ["VITE_API", "API origin; http://127.0.0.1:8787"],
+        [
+          "VITE_MARKETING_ONLY",
+          "true disables browser-management and public-link screens; leave unset when self-hosting"
+        ]
+      ]
+    },
+    {
+      "id": "mac",
+      "title": "Mac client",
+      "paragraphs": [
+        "Launch the Mac app with the API origin and token in its environment."
+      ],
+      "table": [
+        ["Variable", "Purpose / default"],
+        ["LOFT_API", "API origin; http://127.0.0.1:8787"],
+        ["LOFT_TOKEN", "Operator bearer token; dev"]
+      ]
+    }
+  ]
+}

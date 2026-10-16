@@ -1,0 +1,74 @@
+{
+  "path": "/docs/reference/errors",
+  "title": "Errors and troubleshooting",
+  "group": "Reference",
+  "description": "Identify connection, authentication, conflict, and Finder integration failures.",
+  "sections": [
+    {
+      "id": "http",
+      "title": "HTTP errors",
+      "paragraphs": [
+        "Authenticated API failures use an error object with a code. A failed request should be handled explicitly; do not assume a transfer completed because a connection opened."
+      ],
+      "table": [
+        ["Status", "Meaning", "Next step"],
+        [
+          "401",
+          "UNAUTHORIZED",
+          "Check the bearer token and server credentials."
+        ],
+        [
+          "404",
+          "NOT_FOUND",
+          "Check the ID, expiry, revocation, or trash state."
+        ],
+        [
+          "412",
+          "PRECONDITION_FAILED",
+          "Refresh metadata and reconcile the new ETag before retrying."
+        ],
+        [
+          "416",
+          "Unsatisfiable range",
+          "Check the requested bytes against the file size."
+        ],
+        [
+          "500",
+          "STORAGE_ERROR",
+          "Inspect server logs and storage connectivity."
+        ]
+      ],
+      "code": "{\"error\":{\"code\":\"UNAUTHORIZED\"}}",
+      "language": "JSON"
+    },
+    {
+      "id": "connection",
+      "title": "Cannot connect",
+      "paragraphs": [
+        "Check /health at the API address. Verify HTTPS, DNS, reverse-proxy routing, and that VITE_API or LOFT_API points at your server rather than localhost on another device.",
+        "The public loft website does not expose storage endpoints. Browser account or share pages must belong to your self-hosted installation."
+      ]
+    },
+    {
+      "id": "finder",
+      "title": "Drive missing in Finder",
+      "paragraphs": [
+        "A correctly signed and entitled File Provider installation is required. An ad-hoc source build can pass Swift checks while the Finder domain remains unavailable."
+      ],
+      "links": [
+        {
+          "label": "macOS setup",
+          "href": "/docs/guides/macos"
+        }
+      ]
+    },
+    {
+      "id": "retry",
+      "title": "Retry deliberately",
+      "paragraphs": [
+        "For interrupted transfers, verify the server\u2019s current metadata and ETag before resuming. A retry after a version conflict must not overwrite a newer file without an explicit decision.",
+        "Retain failed uploads for retry. For storage failures, resolve disk capacity, credentials, or S3 connectivity before repeating large requests."
+      ]
+    }
+  ]
+}

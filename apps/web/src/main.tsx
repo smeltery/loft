@@ -1,8 +1,8 @@
-import './styles.css'
-import { createRoot } from 'react-dom/client'
-import App from './App'
-import '@fontsource-variable/inter'
+const path = window.location.pathname
+if (path === '/docs' || path.startsWith('/docs/')) {
+  void import('./docs/main')
+} else {
+  void import('./marketing')
+}
 
-const root = document.getElementById('root')
-if (!root) throw new Error('missing #root')
-createRoot(root).render(<App />)
+export {}

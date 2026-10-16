@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 import { renderToString } from 'react-dom/server'
 import App from './App'
+import { appPathFrom } from './app-route'
+import { AppShell } from './app-shell'
 import { faqs, site } from './copy'
 import { RequestPage } from './request-page'
 import { requestTokenFrom } from './request-token'
-import { appPathFrom } from './app-route'
-import { AppShell } from './app-shell'
 import { shareIdFrom } from './share-id'
 import { SharePage } from './share-page'
 
@@ -18,7 +18,8 @@ describe('marketing page', () => {
     expect(html).toContain('Client Work')
     expect(html).toContain('download for mac')
     expect(html).toContain('free forever')
-    expect(html).toContain('https://github.com/smeltery/loft#quick-start')
+    expect(html).toContain('href="/docs"')
+    expect(html).toContain('href="/docs/quick-start"')
     expect(html).not.toContain('href="/app"')
     expect(html).toContain('privacy')
     expect(html).toContain('orbit-mark')

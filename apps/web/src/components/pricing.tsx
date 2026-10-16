@@ -32,6 +32,9 @@ export default function Pricing() {
           <AppleLogo />
           download for mac
         </a>
+        <a className="setup-link" href="/docs/quick-start">
+          read the setup guide <span aria-hidden="true">→</span>
+        </a>
         <p className="price-note">
           self-host loft. only pay your cloud provider for the storage you use.
         </p>

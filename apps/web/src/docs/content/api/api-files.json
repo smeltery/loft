@@ -1,0 +1,51 @@
+{
+  "path": "/docs/api/files",
+  "title": "File transfers",
+  "group": "API endpoints",
+  "description": "Upload, download, and protect file versions with byte ranges and ETags.",
+  "sections": [
+    {
+      "id": "upload",
+      "title": "PUT /v1/files/:id/content",
+      "paragraphs": [
+        "Send file bytes directly as the request body. A new ID returns 201; an existing ID returns 200 with updated metadata. An upload without Content-Range replaces the whole content."
+      ],
+      "code": "curl --fail-with-body -X PUT \\\n  -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  -H \"X-Loft-Name: report.pdf\" \\\n  -H \"Content-Type: application/pdf\" \\\n  --data-binary @report.pdf \\\n  \"$LOFT_API/v1/files/report/content\"",
+      "language": "cURL"
+    },
+    {
+      "id": "download",
+      "title": "GET /v1/files/:id/content",
+      "paragraphs": [
+        "A full read returns 200. A satisfiable byte range returns 206 with Content-Range, Content-Length, and ETag. An invalid range returns 416."
+      ],
+      "code": "curl --fail -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  -H \"Range: bytes=0-1023\" \\\n  \"$LOFT_API/v1/files/report/content\" --output first-kib.bin",
+      "language": "cURL"
+    },
+    {
+      "id": "versions",
+      "title": "Protect a version",
+      "paragraphs": [
+        "Use If-Match with the file ETag to guard a read or write. A mismatch returns 412. Refresh metadata and decide how to handle the conflict instead of retrying blindly.",
+        "Content-Range supports partial uploads. The current server implementation assembles the full object in memory, so size the server for your files and do not treat the API as a constant-memory streaming uploader."
+      ]
+    },
+    {
+      "id": "trash",
+      "title": "Trash and restore",
+      "paragraphs": [
+        "DELETE /v1/files/:id moves a file to trash. POST /v1/files/:id/restore restores it while retained. Files become eligible for purge after 30 days."
+      ],
+      "links": [
+        {
+          "label": "Download a range",
+          "href": "/docs/examples/download-range"
+        },
+        {
+          "label": "Errors and troubleshooting",
+          "href": "/docs/reference/errors"
+        }
+      ]
+    }
+  ]
+}

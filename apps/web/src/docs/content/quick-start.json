@@ -1,0 +1,63 @@
+{
+  "path": "/docs/quick-start",
+  "title": "Quick start",
+  "group": "Start here",
+  "description": "Start a local storage API, upload your first file, and prepare to connect your Mac.",
+  "sections": [
+    {
+      "id": "checkout",
+      "title": "Get the source",
+      "paragraphs": [
+        "Install Bun 1.4.2 or enter the repository\u2019s Flox environment, then install the locked dependencies."
+      ],
+      "code": "git clone https://github.com/smeltery/loft.git\ncd loft\nflox activate\nbun install --frozen-lockfile",
+      "language": "Terminal"
+    },
+    {
+      "id": "start-api",
+      "title": "Start your storage API",
+      "paragraphs": [
+        "In this terminal, choose a random token and keep its value for the client. The disk backend writes data beneath LOFT_DATA. Keep that directory between runs."
+      ],
+      "code": "export LOFT_TOKEN=\"$(openssl rand -hex 32)\"\nexport LOFT_DATA=\"$PWD/.loft-data\"\nbun --filter @loft/api dev",
+      "language": "Terminal"
+    },
+    {
+      "id": "check",
+      "title": "Verify the connection",
+      "paragraphs": [
+        "In a second terminal, set LOFT_API and LOFT_TOKEN to your server address and the same token you chose above. Health is public; listing files requires the token."
+      ],
+      "code": "export LOFT_API=\"http://127.0.0.1:8787\"\nexport LOFT_TOKEN=\"<your-token>\"\ncurl --fail \"$LOFT_API/health\"\ncurl --fail -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  \"$LOFT_API/v1/files\"",
+      "language": "Shell"
+    },
+    {
+      "id": "first-file",
+      "title": "Upload your first file",
+      "paragraphs": [
+        "Use a stable file ID and supply a display name. This example creates a small text file in Inbox."
+      ],
+      "code": "printf \"Hello from loft.\\n\" > hello.txt\ncurl --fail-with-body -X PUT \\\n  -H \"Authorization: Bearer $LOFT_TOKEN\" \\\n  -H \"Content-Type: text/plain\" \\\n  -H \"X-Loft-Name: hello.txt\" \\\n  --data-binary @hello.txt \\\n  \"$LOFT_API/v1/files/hello/content\"",
+      "language": "cURL"
+    },
+    {
+      "id": "clients",
+      "title": "Connect a client",
+      "paragraphs": [
+        "For the self-hosted web interface, start the web workspace from the repository root. Open http://localhost:3000/app and enter your token in settings."
+      ],
+      "code": "VITE_API=http://127.0.0.1:8787 bun run dev --filter=@loft/web",
+      "language": "Terminal",
+      "links": [
+        {
+          "label": "Set up the macOS app",
+          "href": "/docs/guides/macos"
+        },
+        {
+          "label": "Deploy beyond localhost",
+          "href": "/docs/guides/deployment"
+        }
+      ]
+    }
+  ]
+}
