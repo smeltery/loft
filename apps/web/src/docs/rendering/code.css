@@ -1,6 +1,6 @@
 .docs-code .highlighted-code {
   display: flex;
-  color: #303d42;
+  color: var(--ink);
   tab-size: 2;
 }
 .highlighted-code > code {
@@ -12,41 +12,42 @@
   min-width: 40px;
   padding: 0 14px 0 10px;
   text-align: right;
-  color: #8a9582;
+  color: var(--subtle);
   user-select: none;
 }
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-literal {
-  color: #8951a0;
+  color: var(--ink);
+  font-weight: 600;
 }
 .hljs-string,
 .hljs-regexp {
-  color: #39714e;
+  color: var(--muted);
 }
 .hljs-comment,
 .hljs-quote {
-  color: #7c8477;
+  color: var(--subtle);
   font-style: italic;
 }
 .hljs-title,
 .hljs-title.function_,
 .hljs-built_in {
-  color: #276a9a;
+  color: var(--ink);
 }
 .hljs-number,
 .hljs-symbol {
-  color: #a25b30;
+  color: var(--muted);
 }
 .hljs-attr,
 .hljs-property,
 .hljs-variable {
-  color: #8d5c2b;
+  color: var(--muted);
 }
 .hljs-params,
 .hljs-subst {
-  color: #303d42;
+  color: var(--ink);
 }
 .hljs-meta {
-  color: #687b8c;
+  color: var(--muted);
 }

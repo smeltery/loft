@@ -3,8 +3,8 @@
   align-items: center;
   gap: 9px;
   border: 1px solid var(--line);
-  background: #fcfdf7;
-  color: #6b7661;
+  background: var(--surface);
+  color: var(--muted);
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 11px;
@@ -14,23 +14,23 @@
   font:
     10px ui-monospace,
     monospace;
-  border: 1px solid #dce2d4;
+  border: 1px solid var(--line);
   border-radius: 4px;
   padding: 3px 5px;
-  color: #7c8772;
+  color: var(--subtle);
 }
 .docs-search-dialog {
   padding: 0;
   width: min(960px, calc(100vw - 40px));
   max-height: calc(100dvh - 60px);
-  border: 1px solid #d8dfce;
+  border: 1px solid var(--line);
   border-radius: 15px;
   background: var(--paper);
   color: var(--ink);
-  box-shadow: 0 24px 100px #24331b40;
+  box-shadow: 0 24px 100px var(--overlay);
 }
 .docs-search-dialog::backdrop {
-  background: #252c2359;
+  background: var(--backdrop);
   backdrop-filter: blur(3px);
 }
 .search-input-row {
@@ -78,12 +78,12 @@
   font-size: 14px;
 }
 .search-results-pane [aria-selected="true"] a {
-  background: #e9efdf;
-  border-color: #d3dfc4;
+  background: var(--fill);
+  border-color: var(--border-strong);
 }
 .search-results-pane small {
   font-size: 11px;
-  color: #7a8571;
+  color: var(--muted);
 }
 .search-preview {
   padding: 30px;
@@ -108,7 +108,7 @@
   display: inline-block;
   margin-top: 14px;
   font-size: 13px;
-  color: #52703d;
+  color: var(--ink);
 }
 .search-footer {
   display: flex;

@@ -3,35 +3,35 @@
   font-size: 13px;
 }
 .docs-flow a {
-  color: #456336;
+  color: var(--ink);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .docs-code {
   margin: 24px 0;
-  border: 1px solid #dbe1d2;
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fcfdf8;
+  background: var(--surface);
   overflow: hidden;
 }
 .docs-code-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #e3e8dc;
+  border-bottom: 1px solid var(--line);
   padding: 12px 16px;
   font:
     11px ui-monospace,
     monospace;
-  color: #7b8570;
+  color: var(--muted);
 }
 .docs-code button {
-  border: 1px solid #dbe1d2;
-  background: #f0f4e9;
+  border: 1px solid var(--line);
+  background: var(--fill);
   border-radius: 5px;
   padding: 5px 9px;
   font-size: 10px;
-  color: #57674b;
+  color: var(--muted);
 }
 .docs-code pre {
   margin: 0;
@@ -40,7 +40,7 @@
   font:
     12px / 1.9 ui-monospace,
     monospace;
-  color: #456336;
+  color: var(--ink);
 }
 .code-line {
   display: block;
@@ -51,7 +51,7 @@
   width: 38px;
   padding-right: 14px;
   text-align: right;
-  color: #a1ac96;
+  color: var(--subtle);
   user-select: none;
 }
 .endpoint-title {
@@ -65,22 +65,22 @@
     monospace;
   border-radius: 4px;
   padding: 4px 6px;
-  background: #e5eddd;
-  color: #52743d;
+  background: var(--fill);
+  color: var(--ink);
 }
 .method-post {
-  background: #e1eaf0;
-  color: #4a7287;
+  background: var(--fill);
+  color: var(--ink);
 }
 .method-delete {
-  background: #f1e5dc;
-  color: #996a49;
+  background: var(--fill);
+  color: var(--ink);
 }
 .endpoint-path {
   display: block;
   font-size: 13px;
   margin: 18px 0;
-  color: #738269;
+  color: var(--muted);
   overflow-wrap: anywhere;
 }
 .docs-table {
@@ -106,14 +106,14 @@
   display: grid;
   gap: 17px;
   font-size: 11px;
-  color: #7d8773;
+  color: var(--muted);
 }
 .docs-toc p {
   font-size: 9px;
   letter-spacing: 1px;
 }
 .docs-page a:hover {
-  color: #3d602c;
+  color: var(--ink);
 }
 .docs-footer {
   display: flex;
@@ -122,7 +122,7 @@
   justify-content: space-between;
   padding: 0 0 36px;
   font-size: 12px;
-  color: #748269;
+  color: var(--muted);
 }
 
 @media (max-width: 1100px) {

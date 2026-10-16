@@ -28,7 +28,7 @@
     place-items: center;
     border: 0;
     background: transparent;
-    color: #626c59;
+    color: var(--muted);
     width: 34px;
     height: 36px;
     padding: 4px;
@@ -40,7 +40,7 @@
     position: fixed;
     inset: 66px 0 0;
     border: 0;
-    background: #242c2240;
+    background: var(--overlay);
     width: 100%;
   }
   .docs-mobile-panel {
@@ -97,12 +97,13 @@
   padding: 10px;
   font-size: 12px;
   border-radius: 6px;
-  color: #57604f;
+  color: var(--muted);
   line-height: 1.5;
 }
-.docs-sidebar a[aria-current="page"] {
-  background: #e5edda;
-  color: #3b592e;
+.docs-sidebar a[aria-current="page"],
+.docs-sidebar a[aria-current="page"]:hover {
+  background: var(--ink);
+  color: var(--surface);
   font-weight: 600;
 }
 .doc-article-heading {

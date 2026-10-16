@@ -3,7 +3,7 @@
   padding: 20px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fcfdf8;
+  background: var(--surface);
 }
 .docs-main .sequence-scroll {
   border: 0;
@@ -18,7 +18,7 @@
 }
 .sequence-scroll text {
   font: 12px var(--font);
-  fill: #52634a;
+  fill: var(--muted);
 }
 .sequence-figure figcaption {
   font-size: 12px;

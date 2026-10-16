@@ -70,7 +70,7 @@ export function SequenceDiagram({ kind }: { kind: keyof typeof flows }) {
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M0 0 10 5 0 10Z" fill="#789166" />
+              <path d="M0 0 10 5 0 10Z" fill="var(--muted)" />
             </marker>
           </defs>
           {flow.actors.map((actor, index) => (
@@ -81,8 +81,8 @@ export function SequenceDiagram({ kind }: { kind: keyof typeof flows }) {
                 width="160"
                 height="45"
                 rx="7"
-                fill="#eef3e6"
-                stroke="#b4c4a3"
+                fill="var(--fill)"
+                stroke="var(--border-strong)"
               />
               <text x={120 + index * 240} y="43" textAnchor="middle">
                 {actor}
@@ -92,7 +92,7 @@ export function SequenceDiagram({ kind }: { kind: keyof typeof flows }) {
                 x2={120 + index * 240}
                 y1="60"
                 y2={height - 20}
-                stroke="#c5cfbc"
+                stroke="var(--line)"
                 strokeDasharray="4 5"
               />
             </g>
@@ -117,7 +117,7 @@ export function SequenceDiagram({ kind }: { kind: keyof typeof flows }) {
                       : `M${x1} ${y}H${x2}`
                   }
                   fill="none"
-                  stroke="#789166"
+                  stroke="var(--muted)"
                   strokeDasharray={to < from ? '5 4' : undefined}
                   markerEnd={`url(#${id}-arrow)`}
                 />
